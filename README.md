@@ -27,7 +27,7 @@ Chronicle is a collaborative storytelling application that allows users to creat
 
 1. **Clone the repository**:
     ```sh
-    git clone https://github.com/your-username/chronicle.git
+    git clone https://github.com/trillionclues/chronicle.git
     cd chronicle
     ```
 
