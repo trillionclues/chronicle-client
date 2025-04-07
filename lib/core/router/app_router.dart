@@ -1,4 +1,5 @@
 import 'package:chronicle/features/auth/presentation/pages/auth_page.dart';
+import 'package:chronicle/features/home/presentation/page/home_page.dart';
 import 'package:chronicle/splash_page.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,5 +15,11 @@ class AppRouter {
         builder: (context, state) {
           return AuthPage();
         }),
+    GoRoute(
+      path: HomePage.route,
+      builder: (context, state) {
+        return HomePage();
+      },
+    )
   ]);
 }

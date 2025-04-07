@@ -1,5 +1,5 @@
 import 'package:chronicle/core/api/api_client.dart';
-import 'package:chronicle/features/auth/data/auth_repository_impl.dart';
+import 'package:chronicle/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:chronicle/features/auth/data/datasource/auth_remote_datasource.dart';
 import 'package:chronicle/features/auth/domain/repository/auth_repository.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';

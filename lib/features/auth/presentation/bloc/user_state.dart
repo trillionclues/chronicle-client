@@ -14,7 +14,7 @@ class UserState extends Equatable{
 
   final UserModel? userModel;
 
-  UserState._({
+  const UserState._({
     required this.status,
     this.errorMessage,
     this.userModel,
