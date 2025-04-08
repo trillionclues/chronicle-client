@@ -2,6 +2,7 @@ import 'package:chronicle/core/di/get_it.dart';
 import 'package:chronicle/core/router/app_router.dart';
 import 'package:chronicle/core/theme/app_theme.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
+import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/auth/presentation/pages/auth_page.dart';
 import 'package:chronicle/features/home/presentation/page/home_page.dart';
@@ -19,7 +20,7 @@ void main() async {
   );
   setup();
   runApp(BlocProvider(
-    create: (context) => getIt<UserBloc>(),
+    create: (context) => getIt<UserBloc>()..add(GetUserEvent()),
     child: MaterialApp.router(
       routerConfig: AppRouter.router,
       theme: AppTheme.getThemeData(),
@@ -27,7 +28,6 @@ void main() async {
       builder: (context, router) {
         return BlocListener<UserBloc, UserState>(
           listener: (context, state) {
-            print('UserBloc state changed: ${state.status}');
             if (state.status == UserStatus.success) {
               AppRouter.router.go(HomePage.route);
             } else if (state.status == UserStatus.error) {

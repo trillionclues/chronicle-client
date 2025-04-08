@@ -32,7 +32,7 @@ class TokenInterceptor extends Interceptor {
       DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
       try {
-        User? currentUser = await _firebaseAuth.currentUser;
+        User? currentUser = _firebaseAuth.currentUser;
 
         if (currentUser != null) {
           String? newToken = await currentUser.getIdToken(true);
