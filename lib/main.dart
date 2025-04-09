@@ -5,6 +5,7 @@ import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/auth/presentation/pages/auth_page.dart';
+import 'package:chronicle/features/create_game/presentation/bloc/create_game_bloc.dart';
 import 'package:chronicle/features/home/presentation/page/home_page.dart';
 import 'package:chronicle/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,8 +20,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   setup();
-  runApp(BlocProvider(
-    create: (context) => getIt<UserBloc>()..add(GetUserEvent()),
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(create:(context) => getIt<UserBloc>()..add(GetUserEvent())),
+      BlocProvider(create: (context) => getIt<CreateGameBloc>()),
+    ],
     child: MaterialApp.router(
       routerConfig: AppRouter.router,
       theme: AppTheme.getThemeData(),

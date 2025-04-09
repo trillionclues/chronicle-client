@@ -5,8 +5,10 @@ import 'package:chronicle/core/ui/widgets/default_text_field.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
+import 'package:chronicle/features/create_game/presentation/page/create_game_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -84,7 +86,9 @@ class HomePage extends StatelessWidget {
           ),
           DefaultButton(
             text: "Create new game",
-            onPressed: () {},
+            onPressed: () {
+              context.push(CreateGamePage.route);
+            },
             backgroundColor: AppColors.secondary,
             textColor: AppColors.textColor,
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),

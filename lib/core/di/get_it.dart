@@ -6,6 +6,10 @@ import 'package:chronicle/features/auth/data/repository/user_repository_impl.dar
 import 'package:chronicle/features/auth/domain/repository/auth_repository.dart';
 import 'package:chronicle/features/auth/domain/repository/user_repository.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
+import 'package:chronicle/features/create_game/data/datasource/create_game_remote_datasource.dart';
+import 'package:chronicle/features/create_game/data/repository/create_game_repository.impl.dart';
+import 'package:chronicle/features/create_game/domain/repository/create_game_repository.dart';
+import 'package:chronicle/features/create_game/presentation/bloc/create_game_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -28,6 +32,8 @@ void registerDataSource() {
 
   getIt.registerSingleton(AuthRemoteDataSource(dio: dio));
   getIt.registerSingleton(UserRemoteDataSource(dio: dioWithTokenInterceptor));
+  getIt.registerSingleton(
+      CreateGameRemoteDatasource(dio: dioWithTokenInterceptor));
 }
 
 void registerRepository() {
@@ -36,9 +42,14 @@ void registerRepository() {
 
   getIt.registerSingleton<UserRepository>(
       UserRepositoryImpl(userRemoteDataSource: getIt()));
+
+  getIt.registerSingleton<CreateGameRepository>(
+      CreateGameRepositoryImpl(createGameRemoteDataSource: getIt()));
 }
 
 void registerBloc() {
   getIt.registerFactory(
       () => UserBloc(authRepository: getIt(), userRepository: getIt()));
+
+  getIt.registerFactory(() => CreateGameBloc(createGameRepository: getIt()));
 }

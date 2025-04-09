@@ -43,6 +43,7 @@ class AuthPage extends StatelessWidget {
                 textColor: AppColors.textColor,
                 padding: EdgeInsets.symmetric(vertical: 15),
                 backgroundColor: AppColors.secondary,
+                loading: state.status == UserStatus.loading,
                 onPressed: () {
                   context.read<UserBloc>().add(LoginWithGoogleEvent());
                 },
