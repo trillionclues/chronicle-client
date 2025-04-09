@@ -10,4 +10,8 @@ class AuthRemoteDataSource {
     var request = await dio.post("users/login", data: {"token": token});
     return UserModel.fromJson(request.data);
   }
+
+  Future<void> logout() async {
+    await dio.post("users/logout");
+  }
 }

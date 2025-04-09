@@ -5,7 +5,7 @@ enum UserStatus {
   initial,
   loading,
   success,
-  error,
+  error,logout
 }
 
 class UserState extends Equatable{
