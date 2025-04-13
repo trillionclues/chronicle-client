@@ -22,7 +22,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
   String title = "";
   int rounds = 3;
   int roundDuration = 2;
-  int votingDuration = 3;
+  int votingDuration = 2;
   int maximumParticipants = 3;
 
   @override
@@ -58,130 +58,145 @@ class _CreateGamePageState extends State<CreateGamePage> {
     return BlocBuilder<CreateGameBloc, CreateGameState>(
         builder: (context, state) {
       return GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: SafeArea(
+            child: SingleChildScrollView(
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Title",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Title",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    DefaultTextField(
-                      hintText: "Enter story line",
-                      borderRadius: BorderRadius.circular(12),
-                      minLines: 1,
-                      maxLines: 1,
-                      onChanged: (value) {
+                          SizedBox(
+                            height: 10,
+                          ),
+                          DefaultTextField(
+                            hintText: "Enter story line",
+                            borderRadius: BorderRadius.circular(12),
+                            minLines: 1,
+                            maxLines: 1,
+                            onChanged: (value) {
+                              setState(() {
+                                title = value;
+                              });
+                            },
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            "Rounds",
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                          ),
+                        ]),
+                  ),
+                  NumberPicker(
+                      from: 3,
+                      to: 10,
+                      onNumberChanged: (value) {
                         setState(() {
-                          title = value;
+                          rounds = value;
                         });
-                      },
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      "Rounds",
+                      }),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    child: Text(
+                      "Round duration (minutes)",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w500,
                           ),
                     ),
-                  ]),
-            ),
-            NumberPicker(
-                from: 3,
-                to: 10,
-                onNumberChanged: (value) {
-                  setState(() {
-                    rounds = value;
-                  });
-                }),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Text(
-                "Round duration (minutes)",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
+                  ),
+                  NumberPicker(
+                      from: 3,
+                      to: 10,
+                      onNumberChanged: (value) {
+                        setState(() {
+                          roundDuration = value;
+                        });
+                      }),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    child: Text(
+                      "Voting duration (minutes)",
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
-              ),
-            ),
-            NumberPicker(
-                from: 3,
-                to: 10,
-                onNumberChanged: (value) {
-                  setState(() {
-                    roundDuration = value;
-                  });
-                }),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Text(
-                "Voting duration (minutes)",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
+                  ),
+                  NumberPicker(
+                      from: 2,
+                      to: 10,
+                      onNumberChanged: (value) {
+                        setState(() {
+                          votingDuration = value;
+                        });
+                      }),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    child: Text(
+                      "Maximum participants",
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
-              ),
-            ),
-            NumberPicker(
-                from: 2,
-                to: 10,
-                onNumberChanged: (value) {
-                  setState(() {
-                    votingDuration = value;
-                  });
-                }),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Text(
-                "Maximum participants",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
+                  ),
+                  NumberPicker(
+                      from: 3,
+                      to: 10,
+                      onNumberChanged: (value) {
+                        setState(() {
+                          maximumParticipants = value;
+                        });
+                      }),
+                  SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: DefaultButton(
+                      text: "Create",
+                      loading: state.status == CreateGameStatus.loading,
+                      onPressed: title.isEmpty
+                          ? null
+                          : () {
+                              context.read<CreateGameBloc>().add(
+                                  CreateGameEvent(
+                                      title: title,
+                                      rounds: rounds,
+                                      roundDuration: roundDuration,
+                                      votingDuration: votingDuration,
+                                      maximumParticipants:
+                                          maximumParticipants));
+                            },
+                      backgroundColor: AppColors.secondary,
+                      textColor: AppColors.textColor,
                     ),
+                  ),
+                ],
               ),
             ),
-            NumberPicker(
-                from: 3,
-                to: 10,
-                onNumberChanged: (value) {
-                  setState(() {
-                    maximumParticipants = value;
-                  });
-                }),
-            Spacer(),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: DefaultButton(
-                text: "Create",
-                loading: state.status == CreateGameStatus.loading,
-                onPressed: title.isEmpty
-                    ? null
-                    : () {
-                        context.read<CreateGameBloc>().add(CreateGameEvent(
-                            title: title,
-                            rounds: rounds,
-                            roundDuration: roundDuration,
-                            votingDuration: votingDuration,
-                            maximumParticipants: maximumParticipants));
-                      },
-                backgroundColor: AppColors.secondary,
-                textColor: AppColors.textColor,
-              ),
-            ),
-          ],
-        ),
-      );
+          ));
     });
   }
 }
