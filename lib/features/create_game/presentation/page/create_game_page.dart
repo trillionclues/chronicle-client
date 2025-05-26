@@ -5,6 +5,7 @@ import 'package:chronicle/features/create_game/presentation/bloc/create_game_blo
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_event.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_state.dart';
 import 'package:chronicle/features/create_game/presentation/widgets/number_picker.dart';
+import 'package:chronicle/features/game/presentation/page/game_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -55,7 +56,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return BlocBuilder<CreateGameBloc, CreateGameState>(
+    return BlocConsumer<CreateGameBloc, CreateGameState>(
         builder: (context, state) {
       return GestureDetector(
           onTap: () {
@@ -197,6 +198,19 @@ class _CreateGamePageState extends State<CreateGamePage> {
               ),
             ),
           ));
-    });
+    }, listener: (context, state) {
+          if(state.status == CreateGameStatus.success) {
+            if(state.createdGameCode!=null){
+              context.go(GamePage.route(state.createdGameCode!));
+            }
+          } else if (state.status == CreateGameStatus.error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Error creating game"),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+    },);
   }
 }

@@ -6,7 +6,7 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 class ApiClient {
   Dio getDio({bool tokenInterceptor = false}) {
     Dio dio = Dio();
-    dio.options.baseUrl = ApiConfig.BASE_URL;
+    dio.options.baseUrl = ApiConfig.BASE_URL_FOR_DIO;
     if (tokenInterceptor) {
       dio.interceptors.add(TokenInterceptor(dio: dio));
     }

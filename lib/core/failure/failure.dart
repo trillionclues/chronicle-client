@@ -12,3 +12,7 @@ class AuthFailure extends Failure {
 class CreateGameFailure extends Failure {
   CreateGameFailure({required super.message});
 }
+
+class GameFailure extends Failure {
+  GameFailure({required super.message});
+}
