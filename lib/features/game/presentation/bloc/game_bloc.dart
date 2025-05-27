@@ -18,6 +18,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     gameRepository.joinGame(gameCode: event.gameCode, onUpdate: onGameUpdate, onError: onErrorCallback);
   }
 
+
+
   void onGameUpdate({
     required String name,
     required String gameCode,

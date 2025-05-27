@@ -44,7 +44,7 @@ class GameWaitingPage extends StatelessWidget {
               alignment: Alignment.center,
             ),
             child: Text(
-              "Cancel Game",
+              "Leave Game",
             ),
           )
         ],

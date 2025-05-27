@@ -89,3 +89,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 
 For any inquiries, please contact us at [support@chronicle.com](mailto:exceln646@gmail.com).
+
+## Bonus Features
+- i18n support for different languages contributions. [i18n Internationalization](https://react.i18next.com/)
+- Dark mode support.
+- Unit and widget tests for better code quality.

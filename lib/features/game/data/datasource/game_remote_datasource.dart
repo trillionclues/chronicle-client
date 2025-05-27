@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 
 import 'package:chronicle/core/api/api_config.dart';
 import 'package:chronicle/features/game/domain/game_repository.dart';
