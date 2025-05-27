@@ -14,11 +14,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   Future onJoinGameEvent(JoinGameEvent event, Emitter emit) async {
-    emit(state.copyWith(status: GameStatus.initial));
+    emit(state.copyWith(status: GameStatus.loading));
     gameRepository.joinGame(gameCode: event.gameCode, onUpdate: onGameUpdate, onError: onErrorCallback);
   }
-
-
 
   void onGameUpdate({
     required String name,

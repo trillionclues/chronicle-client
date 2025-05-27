@@ -7,7 +7,7 @@ class CreateGameState extends Equatable {
   final String? errorMessage;
   final String? createdGameCode;
 
-  CreateGameState._({
+  const CreateGameState._({
     required this.status,
     this.errorMessage,
     this.createdGameCode,

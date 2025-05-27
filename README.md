@@ -4,7 +4,7 @@ Chronicle - Create stories together
 
 ## Overview
 
-Chronicle is a collaborative storytelling application that allows users to create and share stories together. The app leverages Firebase for authentication and backend services, and it is built using Flutter for a seamless cross-platform experience.
+Chronicle is a collaborative storytelling mobile app that allows users to create and share stories together. The app leverages Firebase for authentication and backend services, and it is built using Flutter for a seamless cross-platform experience.
 
 ## Features
 
