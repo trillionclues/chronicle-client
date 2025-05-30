@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chronicle/core/di/get_it.dart';
 import 'package:chronicle/features/game/domain/model/game_phase_model.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
@@ -24,6 +26,7 @@ class GamePage extends StatelessWidget {
           getIt<GameBloc>()..add(JoinGameEvent(gameCode: gameCode)),
       child: Scaffold(
         body: BlocBuilder<GameBloc, GameState>(builder: (context, state) {
+          log("GamePage: ${state.status} - ${state.gamePhase} - ${state.title}");
           if(state.gamePhase == GamePhase.waiting) {
             return GameWaitingPage();
           }

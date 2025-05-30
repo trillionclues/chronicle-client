@@ -30,13 +30,13 @@ class GameWaitingPage extends StatelessWidget {
               icon: Icon(Icons.chevron_left)),
           Text(
             "Waiting for players...",
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           Spacer(),
           TextButton(
             onPressed: () {},
             style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 12),
               textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: AppColors.errorColor,
                   ),

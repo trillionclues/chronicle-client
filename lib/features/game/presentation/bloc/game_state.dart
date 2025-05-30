@@ -1,6 +1,7 @@
 import 'package:chronicle/features/game/domain/model/game_phase_model.dart';
 import 'package:chronicle/features/game/domain/model/participant_model.dart';
 import 'package:chronicle/features/game/domain/model/story_fragment_model.dart';
+import 'package:chronicle/features/game/presentation/bloc/game_event.dart';
 
 enum GameStatus {
   initial,
@@ -9,72 +10,108 @@ enum GameStatus {
   error,
 }
 
+
+class GameStateUpdatedEvent extends GameEvent {
+  final String name;
+  final String gameCode;
+  final GamePhase phase;
+  final String gameId;
+  final int currentRound;
+  final int rounds;
+  final int votingTime;
+  final int roundTime;
+  final int? remainingTime;
+  final int maxParticipants;
+  final List<ParticipantModel> participants;
+  final List<StoryFragmentModel> history;
+
+  GameStateUpdatedEvent({
+    required this.name,
+    required this.gameCode,
+    required this.phase,
+    required this.gameId,
+    required this.currentRound,
+    required this.rounds,
+    required this.votingTime,
+    required this.roundTime,
+    required this.remainingTime,
+    required this.maxParticipants,
+    required this.participants,
+    required this.history,
+  });
+}
+
+class GameErrorEvent extends GameEvent {
+  final String errorMessage;
+  GameErrorEvent({required this.errorMessage});
+}
+
 class GameState {
   final GameStatus status;
-  final String? errorMessage;
+  final String? title;
   final String? gameCode;
   final String? gameId;
-  final GamePhase? gamePhase;
-  final String? title;
-  final int? roundDuration;
-  final int? votingDuration;
-  final int? rounds;
+  final GamePhase gamePhase;
+  final int currentRound;
+  final int rounds;
+  final int votingDuration;
+  final int roundDuration;
   final int? remainingTime;
-  final int? currentRound;
-  final int? maximumParticipants;
-  final List<ParticipantModel>? participants;
-  final List<StoryFragmentModel>? history;
+  final int maximumParticipants;
+  final List<ParticipantModel> participants;
+  final List<StoryFragmentModel> history;
+  final String? errorMessage;
 
   GameState._({
     required this.status,
-    this.errorMessage,
+    this.title,
     this.gameCode,
     this.gameId,
-    this.gamePhase,
-    this.title,
-    this.roundDuration,
-    this.votingDuration,
-    this.rounds,
+    this.gamePhase = GamePhase.waiting,
+    this.currentRound = 1,
+    this.rounds = 5,
+    this.votingDuration = 60,
+    this.roundDuration = 120,
     this.remainingTime,
-    this.currentRound,
-    this.maximumParticipants,
-    this.participants,
-    this.history,
+    this.maximumParticipants = 10,
+    this.participants = const [],
+    this.history = const [],
+    this.errorMessage,
   });
 
   factory GameState.initial() => GameState._(status: GameStatus.initial);
 
   GameState copyWith({
     GameStatus? status,
-    String? errorMessage,
+    String? title,
     String? gameCode,
     String? gameId,
     GamePhase? gamePhase,
-    String? title,
-    int? roundDuration,
-    int? votingDuration,
-    int? rounds,
-    int? remainingTime,
     int? currentRound,
+    int? rounds,
+    int? votingDuration,
+    int? roundDuration,
+    int? remainingTime,
     int? maximumParticipants,
     List<ParticipantModel>? participants,
     List<StoryFragmentModel>? history,
+    String? errorMessage,
   }) {
     return GameState._(
       status: status ?? this.status,
-      errorMessage: errorMessage ?? this.errorMessage,
+      title: title ?? this.title,
       gameCode: gameCode ?? this.gameCode,
       gameId: gameId ?? this.gameId,
       gamePhase: gamePhase ?? this.gamePhase,
-      title: title ?? this.title,
-      roundDuration: roundDuration ?? this.roundDuration,
-      votingDuration: votingDuration ?? this.votingDuration,
-      rounds: rounds ?? this.rounds,
-      remainingTime: remainingTime ?? this.remainingTime,
       currentRound: currentRound ?? this.currentRound,
+      rounds: rounds ?? this.rounds,
+      votingDuration: votingDuration ?? this.votingDuration,
+      roundDuration: roundDuration ?? this.roundDuration,
+      remainingTime: remainingTime ?? this.remainingTime,
       maximumParticipants: maximumParticipants ?? this.maximumParticipants,
       participants: participants ?? this.participants,
       history: history ?? this.history,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 }

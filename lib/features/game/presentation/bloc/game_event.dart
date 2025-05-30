@@ -1,4 +1,4 @@
-abstract class GameEvent{}
+abstract class GameEvent {}
 
 class JoinGameEvent extends GameEvent {
   final String gameCode;
