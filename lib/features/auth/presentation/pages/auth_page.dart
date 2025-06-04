@@ -1,4 +1,5 @@
 import 'package:chronicle/core/theme/app_colors.dart';
+import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
@@ -53,8 +54,10 @@ class AuthPage extends StatelessWidget {
         );
       }, listener: (context, state) {
         if (state.status == UserStatus.error) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.errorMessage ?? "")));
+          ChronicleSnackBar.showError(
+            context: context,
+            message: state.errorMessage ?? "",
+          );
         }
       })),
     );
