@@ -44,20 +44,17 @@ class SocketManager {
 
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        onError('User not authenticated');
         _isConnecting = false;
         return;
       }
 
       final token = await user.getIdToken(true);
       if (token!.isEmpty) {
-        onError('Failed to get authentication token');
         _isConnecting = false;
         return;
       }
 
       log('Connecting to socket with URL: $baseUrl');
-      log('Token length: ${token.length}');
       log('User ID: ${user.uid}');
 
       final socketOptions = IO.OptionBuilder()
@@ -112,7 +109,6 @@ class SocketManager {
       _isConnecting = false;
 
       if (!connected && !_isDisposed) {
-        log('❌ Connection failed after timeout');
         onError('Connection timeout');
         await _disconnect();
       }
@@ -157,7 +153,6 @@ class SocketManager {
     });
 
     _socket!.onError((error) {
-      log('❌ Socket error: $error');
       if (!_isDisposed) {
         onError('Socket error: $error');
       }
@@ -303,7 +298,6 @@ class SocketManager {
       return;
     }
 
-    log('🎮 Joining game by code: $gameCode');
     _socket?.emit('joinGameByCode', gameCode);
   }
 
@@ -355,7 +349,6 @@ class SocketManager {
   Future<void> dispose() async {
     if (_isDisposed) return;
 
-    log('🗑️ Disposing SocketManager');
     _isDisposed = true;
 
     await _disconnect();

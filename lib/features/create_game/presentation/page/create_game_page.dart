@@ -2,6 +2,7 @@ import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
+import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_bloc.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_event.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_state.dart';
@@ -44,7 +45,10 @@ class _CreateGamePageState extends State<CreateGamePage> {
               onPressed: () {
                 context.pop();
               },
-              icon: Icon(Icons.chevron_left)),
+              icon: Icon(
+                Icons.chevron_left,
+                size: ChronicleSizes.iconLarge,
+              )),
           Text(
             "Create Game",
             style: Theme.of(context).textTheme.headlineMedium,
@@ -52,7 +56,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
         ],
       ),
       titleSpacing: 0,
-      toolbarHeight: 60,
+      toolbarHeight: ChronicleSizes.appBarHeight,
     );
   }
 
@@ -60,9 +64,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
     return BlocConsumer<CreateGameBloc, CreateGameState>(
       builder: (context, state) {
         return GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
+            onTap: () => FocusScope.of(context).unfocus(),
             child: SafeArea(
               child: SingleChildScrollView(
                 child: Column(
@@ -83,23 +85,17 @@ class _CreateGamePageState extends State<CreateGamePage> {
                                     fontWeight: FontWeight.w500,
                                   ),
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
+                            ChronicleSpacing.verticalSM,
                             DefaultTextField(
                               hintText: "Enter story line",
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(
+                                  ChronicleSizes.smallBorderRadius),
                               minLines: 1,
                               maxLines: 1,
-                              onChanged: (value) {
-                                setState(() {
-                                  title = value;
-                                });
-                              },
+                              onChanged: (value) =>
+                                  setState(() => title = value),
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
+                            ChronicleSpacing.verticalMD,
                             Text(
                               "Rounds",
                               style: Theme.of(context)
@@ -111,14 +107,14 @@ class _CreateGamePageState extends State<CreateGamePage> {
                             ),
                           ]),
                     ),
+                    ChronicleSpacing.verticalSM,
                     NumberPicker(
-                        from: 3,
-                        to: 10,
-                        onNumberChanged: (value) {
-                          setState(() {
-                            rounds = value;
-                          });
-                        }),
+                      from: 3,
+                      to: 10,
+                      onNumberChanged: (value) =>
+                          setState(() => rounds = value),
+                    ),
+                    ChronicleSpacing.verticalLG,
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 15),
@@ -129,14 +125,14 @@ class _CreateGamePageState extends State<CreateGamePage> {
                             ),
                       ),
                     ),
+                    ChronicleSpacing.verticalSM,
                     NumberPicker(
-                        from: 3,
-                        to: 10,
-                        onNumberChanged: (value) {
-                          setState(() {
-                            roundDuration = value;
-                          });
-                        }),
+                      from: 3,
+                      to: 10,
+                      onNumberChanged: (value) =>
+                          setState(() => roundDuration = value),
+                    ),
+                    ChronicleSpacing.verticalLG,
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 15),
@@ -147,14 +143,14 @@ class _CreateGamePageState extends State<CreateGamePage> {
                             ),
                       ),
                     ),
+                    ChronicleSpacing.verticalSM,
                     NumberPicker(
-                        from: 2,
-                        to: 10,
-                        onNumberChanged: (value) {
-                          setState(() {
-                            votingDuration = value;
-                          });
-                        }),
+                      from: 2,
+                      to: 10,
+                      onNumberChanged: (value) =>
+                          setState(() => votingDuration = value),
+                    ),
+                    ChronicleSpacing.verticalLG,
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 15),
@@ -165,15 +161,14 @@ class _CreateGamePageState extends State<CreateGamePage> {
                             ),
                       ),
                     ),
+                    ChronicleSpacing.verticalSM,
                     NumberPicker(
-                        from: 3,
-                        to: 10,
-                        onNumberChanged: (value) {
-                          setState(() {
-                            maximumParticipants = value;
-                          });
-                        }),
-                    SizedBox(height: 40),
+                      from: 3,
+                      to: 10,
+                      onNumberChanged: (value) =>
+                          setState(() => maximumParticipants = value),
+                    ),
+                    ChronicleSpacing.verticalXL,
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: DefaultButton(
@@ -212,7 +207,15 @@ class _CreateGamePageState extends State<CreateGamePage> {
               context: context,
               message: "Game created successfully!",
             );
-            context.go(GamePage.route(state.createdGameCode!));
+            // delay before navigating
+            Future.delayed(
+                const Duration(
+                  milliseconds: 500,
+                ), () {
+              if (context.mounted) {
+                context.go(GamePage.route(state.createdGameCode!));
+              }
+            });
           }
         } else if (state.status == CreateGameStatus.error) {
           ChronicleSnackBar.showError(

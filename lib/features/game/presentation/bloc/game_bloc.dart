@@ -12,20 +12,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class GameBloc extends Bloc<GameEvent, GameState> {
   final GameRepository gameRepository;
   StreamSubscription? _gameSubscription;
-  bool _disposed = false; // Add disposal tracking
+  bool _disposed = false;
 
   GameBloc({required this.gameRepository}) : super(GameState.initial()) {
     on<JoinGameEvent>(_onJoinGameEvent);
     on<GameStateUpdatedEvent>(_onGameStateUpdateEvent);
     on<GameErrorEvent>(_onGameErrorEvent);
-    on<DisposeGameEvent>(_onDisposeGameEvent); // Add dispose event
+    on<DisposeGameEvent>(_onDisposeGameEvent);
   }
 
   Future<void> _onJoinGameEvent(
       JoinGameEvent event, Emitter<GameState> emit) async {
-    if (_disposed) return; // Check if disposed
+    if (_disposed) return;
 
-    log('🎮 GameBloc: Joining game with code: ${event.gameCode}');
     emit(state.copyWith(status: GameStatus.loading));
 
     try {
@@ -35,7 +34,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         onError: _onErrorCallback,
       );
     } catch (e) {
-      log('❌ GameBloc: Error joining game: $e');
       if (!_disposed) {
         emit(state.copyWith(
           status: GameStatus.error,
@@ -49,7 +47,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       GameStateUpdatedEvent event, Emitter<GameState> emit) {
     if (_disposed) return; // Check if disposed
 
-    log('📡 GameBloc: Game state updated - Phase: ${event.phase}, Round: ${event.currentRound}');
     emit(state.copyWith(
       status: GameStatus.success,
       title: event.name,
@@ -69,9 +66,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onGameErrorEvent(GameErrorEvent event, Emitter<GameState> emit) {
-    if (_disposed) return; // Check if disposed
+    if (_disposed) return;
 
-    log('❌ GameBloc: Game error: ${event.errorMessage}');
     emit(state.copyWith(
       status: GameStatus.error,
       errorMessage: event.errorMessage,
@@ -79,7 +75,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onDisposeGameEvent(DisposeGameEvent event, Emitter<GameState> emit) {
-    log('🗑️ GameBloc: Disposing resources');
     _disposed = true;
     _gameSubscription?.cancel();
   }
@@ -98,9 +93,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     required List<ParticipantModel> participants,
     required List<StoryFragmentModel> history,
   }) {
-    if (_disposed) return; // Check if disposed before adding events
+    if (_disposed) return;
 
-    log('🔄 GameBloc: Received game update callback');
     try {
       add(GameStateUpdatedEvent(
         name: name,
@@ -122,9 +116,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onErrorCallback(String errorMessage) {
-    if (_disposed) return; // Check if disposed before adding events
-
-    log('❌ GameBloc: Received error callback: $errorMessage');
+    if (_disposed) return;
     try {
       add(GameErrorEvent(errorMessage: errorMessage));
     } catch (e) {

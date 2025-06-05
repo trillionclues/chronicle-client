@@ -151,10 +151,10 @@ class ChronicleSnackBar {
         );
       case ChronicleSnackBarType.game:
         return SnackBarTheme(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppColors.secondary,
           textColor: AppColors.textColor,
           icon: Icons.auto_stories_outlined,
-          actionColor: AppColors.secondary,
+          actionColor: AppColors.textColor,
           borderColor: AppColors.secondary,
         );
       case ChronicleSnackBarType.info:

@@ -31,8 +31,11 @@ class GamePage extends StatelessWidget {
             return GameWaitingPage();
           }
           return Center(
-            child: Text("${state.title}", style: Theme.of(context).textTheme.headlineLarge,),
-        );
+            child: Text(
+              "${state.title}",
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+          );
         }),
       ),
     );

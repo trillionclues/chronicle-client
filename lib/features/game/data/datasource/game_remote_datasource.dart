@@ -87,14 +87,12 @@ class GameRemoteDatasource {
         try {
           _processGameStateUpdate(data, onUpdate, onError);
         } catch (e) {
-          log('Error processing game state: $e');
           if (!_isDisposed) {
             onError('Error processing game update');
           }
         }
       },
       onError: (error) {
-        log('Game state stream error: $error');
         if (!_isDisposed) {
           onError('Game state stream error');
         }
@@ -116,7 +114,6 @@ class GameRemoteDatasource {
     // Connection status stream
     connectionStream.listen(
       (isConnected) {
-        log('Connection status changed: $isConnected');
         if (!isConnected && !_isDisposed) {
           onError('Connection lost');
         }
@@ -139,13 +136,12 @@ class GameRemoteDatasource {
 
   void _handleGameStateUpdate(Map<String, dynamic> data) {
     if (_isDisposed) return;
-    log('📡 Raw game state data: $data');
+    // log('📡 Raw game state data: $data');
     _safeAddToStream(_gameStateController, data);
   }
 
   void _handleError(String error) {
     if (_isDisposed) return;
-    log('❌ Socket error: $error');
     _safeAddToStream(_errorController, error);
   }
 
@@ -219,9 +215,7 @@ class GameRemoteDatasource {
         );
       }
 
-      log('✅ Game state processed successfully');
     } catch (e, stackTrace) {
-      log('❌ Error processing game state: $e\n$stackTrace');
       if (!_isDisposed) {
         onError('Error processing game update: $e');
       }
@@ -317,7 +311,6 @@ class GameRemoteDatasource {
   void dispose() {
     if (_isDisposed) return;
 
-    log('🗑️ Disposing GameRemoteDatasource');
     _isDisposed = true;
 
     try {

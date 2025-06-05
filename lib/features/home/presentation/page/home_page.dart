@@ -2,6 +2,7 @@ import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/circle_user_avatar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
+import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
@@ -29,10 +30,10 @@ class HomePage extends StatelessWidget {
         return Row(
           children: [
             CircleUserAvatar(
-                width: 50, height: 50, url: state.userModel?.photoUrl ?? ""),
-            SizedBox(
-              width: 10,
-            ),
+                width: ChronicleSizes.avatarMedium,
+                height: ChronicleSizes.avatarMedium,
+                url: state.userModel?.photoUrl ?? ""),
+            ChronicleSpacing.horizontalSM,
             Text(
               state.userModel?.name ?? "",
               style: Theme.of(context).textTheme.headlineMedium,
@@ -45,53 +46,49 @@ class HomePage extends StatelessWidget {
             onPressed: () {
               onLogoutPressed(context);
             },
-            icon: Icon(Icons.logout)),
+            icon: Icon(
+              Icons.logout,
+              size: ChronicleSizes.iconMedium,
+            )),
       ],
     );
   }
 
   Widget _buildJoinGame(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(ChronicleSpacing.screenPadding),
       child: Column(
         children: [
-          SizedBox(
-            height: 15,
-          ),
+          ChronicleSpacing.verticalLG,
           Text(
             "Join via code",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          SizedBox(
-            height: 15,
-          ),
+          ChronicleSpacing.verticalMD,
           DefaultTextField(
             hintText: "Enter game code",
+            borderRadius:
+                BorderRadius.circular(ChronicleSizes.smallBorderRadius),
             actionIcon: IconButton(
                 onPressed: () {},
                 icon: Icon(
                   Icons.arrow_circle_right_outlined,
-                  size: 30,
+                  size: ChronicleSizes.iconLarge,
                 )),
           ),
-          SizedBox(
-            height: 15,
-          ),
+          ChronicleSpacing.verticalLG,
           Text(
             "or",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          SizedBox(
-            height: 15,
-          ),
+          ChronicleSpacing.verticalLG,
           DefaultButton(
             text: "Create new game",
-            onPressed: () {
-              context.push(CreateGamePage.route);
-            },
+            onPressed: () => context.push(CreateGamePage.route),
             backgroundColor: AppColors.secondary,
             textColor: AppColors.textColor,
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
+            padding: const EdgeInsets.symmetric(
+                vertical: ChronicleSpacing.md, horizontal: ChronicleSpacing.sm),
           )
         ],
       ),
@@ -107,9 +104,7 @@ class HomePage extends StatelessWidget {
             content: Text("Are you sure you want to logout?"),
             actions: [
               TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  onPressed: () => Navigator.pop(context),
                   child: Text("Cancel")),
               ElevatedButton(
                   onPressed: () {
