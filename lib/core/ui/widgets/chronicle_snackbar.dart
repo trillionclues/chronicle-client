@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 enum ChronicleSnackBarType { info, success, warning, error, game }
 
 class ChronicleSnackBar {
+  static OverlayEntry? _currentOverlay;
+
   static void show({
     required BuildContext context,
     required String message,
@@ -16,39 +18,24 @@ class ChronicleSnackBar {
   }) {
     final theme = _getSnackBarTheme(type);
 
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: ChronicleSnackBarContent(
-          message: message,
-          type: type,
-          theme: theme,
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+    _currentOverlay?.remove();
+    _currentOverlay = OverlayEntry(
+      builder: (context) => _TopSnackBarWidget(
+        message: message,
+        type: type,
+        theme: theme,
         duration: duration,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        padding: EdgeInsets.zero,
-        // action: actionLabel != null
-        //     ? SnackBarAction(
-        //         label: actionLabel,
-        //         textColor: theme.actionColor,
-        //         backgroundColor: Colors.transparent,
-        //         onPressed: onActionPressed ?? () {},
-        //       )
-        //     : showCloseButton
-        //         ? SnackBarAction(
-        //             label: '✕',
-        //             textColor: theme.textColor.withOpacity(0.7),
-        //             backgroundColor: Colors.transparent,
-        //             onPressed: () {
-        //               ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        //             },
-        //           )
-        //         : null,
+        actionLabel: actionLabel,
+        onActionPressed: onActionPressed,
+        showCloseButton: showCloseButton,
+        onDismiss: () {
+          _currentOverlay?.remove();
+          _currentOverlay = null;
+        },
       ),
     );
+
+    Overlay.of(context).insert(_currentOverlay!);
   }
 
   // Quick success message
@@ -183,4 +170,107 @@ class SnackBarTheme {
     required this.actionColor,
     required this.borderColor,
   });
+}
+
+class _TopSnackBarWidget extends StatefulWidget {
+  final String message;
+  final ChronicleSnackBarType type;
+  final SnackBarTheme theme;
+  final Duration duration;
+  final String? actionLabel;
+  final VoidCallback? onActionPressed;
+  final bool showCloseButton;
+  final VoidCallback onDismiss;
+
+  const _TopSnackBarWidget({
+    required this.message,
+    required this.type,
+    required this.theme,
+    required this.duration,
+    this.actionLabel,
+    this.onActionPressed,
+    required this.showCloseButton,
+    required this.onDismiss,
+  });
+
+  @override
+  State<_TopSnackBarWidget> createState() => _TopSnackBarWidgetState();
+}
+
+class _TopSnackBarWidgetState extends State<_TopSnackBarWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1), // Start above screen
+      end: Offset.zero, // End at normal position
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutBack,
+    ));
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    ));
+
+    // Start animation
+    _controller.forward();
+
+    // Auto dismiss after duration
+    Future.delayed(widget.duration, () {
+      if (mounted) {
+        _dismiss();
+      }
+    });
+  }
+
+  void _dismiss() async {
+    await _controller.reverse();
+    widget.onDismiss();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 15,
+      left: 16,
+      right: 16,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Material(
+            elevation: 8,
+            borderRadius: BorderRadius.circular(12),
+            color: widget.theme.backgroundColor,
+            child: ChronicleSnackBarContent(
+              message: widget.message,
+              type: widget.type,
+              theme: widget.theme,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

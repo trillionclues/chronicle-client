@@ -193,6 +193,8 @@ class _CreateGamePageState extends State<CreateGamePage> {
                               },
                         backgroundColor: AppColors.secondary,
                         textColor: AppColors.textColor,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: ChronicleSpacing.md, horizontal: ChronicleSpacing.sm)
                       ),
                     ),
                   ],

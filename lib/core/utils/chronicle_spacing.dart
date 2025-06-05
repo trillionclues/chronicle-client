@@ -289,6 +289,34 @@ class ChronicleLayouts {
   );
 }
 
+class ChronicleTextStyles {
+  ChronicleTextStyles._();
+
+  static const double _baseFontSize = 16.0;
+
+  // Font sizes
+  static const double xs = _baseFontSize * 0.75; // 12px
+  static const double sm = _baseFontSize * 0.875; // 14px
+  static const double md = _baseFontSize * 1.0; // 16px (base)
+  static const double lg = _baseFontSize * 1.25; // 20px
+  static const double xl = _baseFontSize * 1.5; // 24px
+  static const double xxl = _baseFontSize * 1.75; // 28px
+  static const double xxxl = _baseFontSize * 2.0; // 32px
+
+// Text styles
+  static TextStyle bodyLarge(BuildContext context) =>
+      Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: lg) ??
+      TextStyle(fontSize: lg);
+
+  static TextStyle bodyMedium(BuildContext context) =>
+      Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: md) ??
+      TextStyle(fontSize: md);
+
+  static TextStyle bodySmall(BuildContext context) =>
+      Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: sm) ??
+      TextStyle(fontSize: sm);
+}
+
 // USAGE EXAMPLES AND DOCUMENTATION:
 /*
 

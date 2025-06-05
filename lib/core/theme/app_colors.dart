@@ -9,3 +9,17 @@ class AppColors {
 
   static const Color errorColor = Color(0xFFFF4B4B);
 }
+
+Color getAvatarColor(String name) {
+  final colors = [
+    Color(0xFF6366F1), // Indigo
+    Color(0xFF8B5CF6), // Violet
+    Color(0xFFEC4899), // Pink
+    Color(0xFF06B6D4), // Cyan
+    Color(0xFF10B981), // Emerald
+    Color(0xFFF59E0B), // Amber
+    Color(0xFFEF4444), // Red
+    Color(0xFF84CC16), // Lime
+  ];
+  return colors[name.hashCode % colors.length];
+}
