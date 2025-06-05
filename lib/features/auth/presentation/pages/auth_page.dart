@@ -1,6 +1,7 @@
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
+import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
@@ -24,31 +25,39 @@ class AuthPage extends StatelessWidget {
             children: [
               Text(
                 "Chronicle",
-                style: Theme.of(context).textTheme.headlineLarge,
+                style: ChronicleTextStyles.bodyLarge(context).copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: ChronicleTextStyles.xl,
+                ),
               ),
               const Spacer(),
               SvgPicture.asset("assets/images/login_image.svg"),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
+                padding:
+                    EdgeInsets.symmetric(vertical: ChronicleSpacing.sm + 2),
                 child: Text(
                   "Collaborate with friends and craft unique stories.",
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: ChronicleTextStyles.bodyLarge(context).copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: ChronicleTextStyles.lg,
+                  ),
                 ),
               ),
               const Spacer(
                 flex: 2,
               ),
               DefaultButton(
-                text: "Login with Google",
-                textColor: AppColors.textColor,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                backgroundColor: AppColors.secondary,
-                loading: state.status == UserStatus.loading,
-                onPressed: () {
-                  context.read<UserBloc>().add(LoginWithGoogleEvent());
-                },
-              )
+                  text: "Login with Google",
+                  textColor: AppColors.surface,
+                  backgroundColor: AppColors.primary,
+                  loading: state.status == UserStatus.loading,
+                  onPressed: () {
+                    context.read<UserBloc>().add(LoginWithGoogleEvent());
+                  },
+                  padding: const EdgeInsets.symmetric(
+                      vertical: ChronicleSpacing.md,
+                      horizontal: ChronicleSpacing.sm))
             ],
           ),
         );

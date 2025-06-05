@@ -115,7 +115,7 @@ class ChronicleSnackBar {
       case ChronicleSnackBarType.success:
         return SnackBarTheme(
           backgroundColor: AppColors.secondary,
-          textColor: AppColors.textColor,
+          textColor: AppColors.surface,
           icon: Icons.check_circle_outline,
           actionColor: AppColors.textColor,
           borderColor: AppColors.secondary,
@@ -131,7 +131,7 @@ class ChronicleSnackBar {
       case ChronicleSnackBarType.warning:
         return SnackBarTheme(
           backgroundColor: const Color(0xFFF59E0B),
-          textColor: Colors.white,
+          textColor:AppColors.surface,
           icon: Icons.warning_outlined,
           actionColor: Colors.white,
           borderColor: const Color(0xFFD97706),
@@ -139,7 +139,7 @@ class ChronicleSnackBar {
       case ChronicleSnackBarType.game:
         return SnackBarTheme(
           backgroundColor: AppColors.secondary,
-          textColor: AppColors.textColor,
+          textColor: AppColors.surface,
           icon: Icons.auto_stories_outlined,
           actionColor: AppColors.textColor,
           borderColor: AppColors.secondary,
@@ -147,7 +147,7 @@ class ChronicleSnackBar {
       case ChronicleSnackBarType.info:
         return SnackBarTheme(
           backgroundColor: const Color(0xFF6B7280),
-          textColor: Colors.white,
+          textColor: AppColors.surface,
           icon: Icons.info_outline,
           actionColor: Colors.white,
           borderColor: const Color(0xFF4B5563),

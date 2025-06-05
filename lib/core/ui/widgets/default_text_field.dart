@@ -1,4 +1,5 @@
 import 'package:chronicle/core/theme/app_colors.dart';
+import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:flutter/material.dart';
 
 class DefaultTextField extends StatelessWidget {
@@ -38,14 +39,14 @@ class DefaultTextField extends StatelessWidget {
           counterStyle: Theme.of(context).textTheme.bodySmall,
           hintText: hintText,
           suffixIcon: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.md + 4),
             child: actionIcon,
           ),
           hintStyle: Theme.of(context)
               .textTheme
               .bodyMedium
               ?.copyWith(color: AppColors.textColor.withOpacity(0.5)),
-          contentPadding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          contentPadding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.xl - 2, vertical: ChronicleSpacing.md),
           border: OutlineInputBorder(
               borderSide: BorderSide.none,
               borderRadius: borderRadius ?? BorderRadius.circular(40))),

@@ -4,7 +4,6 @@ import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/core/utils/game_utils.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
-import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
@@ -69,62 +68,69 @@ class GameWaitingPage extends StatelessWidget {
     return BlocBuilder<GameBloc, GameState>(builder: (context, state) {
       return Padding(
         padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GameCodeCardWidget(state: state),
-            ChronicleSpacing.verticalXL,
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "${state.title}",
-                  style: ChronicleTextStyles.bodyMedium(context).copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.primary,
+        child: state.status == GameStatus.loading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primary,
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GameCodeCardWidget(state: state),
+                  ChronicleSpacing.verticalLG,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${state.title}",
+                        style: ChronicleTextStyles.bodyLarge(context).copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
-            ),
-            ChronicleSpacing.verticalXS,
-            RichText(
-                text: TextSpan(
-                    style: ChronicleTextStyles.bodyMedium(context),
-                    children: [
-                  TextSpan(text: "Round Duration: "),
-                  TextSpan(
-                      text: "${state.roundDuration ~/ 60} minutes",
-                      style: ChronicleTextStyles.bodyMedium(context)
-                          .copyWith(fontWeight: FontWeight.w500)),
-                ])),
-            ChronicleSpacing.verticalXS,
-            RichText(
-                text: TextSpan(
-                    style: ChronicleTextStyles.bodyMedium(context),
-                    children: [
-                  TextSpan(text: "Voting Duration: "),
-                  TextSpan(
-                      text: "${state.votingDuration ~/ 60} minutes",
-                      style: ChronicleTextStyles.bodyMedium(context)
-                          .copyWith(fontWeight: FontWeight.w500)),
-                ])),
-            ChronicleSpacing.verticalXS,
-            RichText(
-                text: TextSpan(
-                    style: ChronicleTextStyles.bodyMedium(context),
-                    children: [
-                  TextSpan(text: "Rounds: "),
-                  TextSpan(
-                      text: "${state.rounds}",
-                      style: ChronicleTextStyles.bodyMedium(context)
-                          .copyWith(fontWeight: FontWeight.w500)),
-                ])),
-            ChronicleSpacing.verticalLG,
-            ParticipantsWidget(),
-            const Spacer(),
-            _buildStartGameButton(context, state),
-          ],
-        ),
+                  ChronicleSpacing.verticalXS,
+                  RichText(
+                      text: TextSpan(
+                          style: ChronicleTextStyles.bodySmall(context),
+                          children: [
+                        TextSpan(text: "Round Duration: "),
+                        TextSpan(
+                            text: "${state.roundDuration ~/ 60} minutes",
+                            style: ChronicleTextStyles.bodySmall(context)
+                                .copyWith(fontWeight: FontWeight.w500)),
+                      ])),
+                  ChronicleSpacing.verticalXS,
+                  RichText(
+                      text: TextSpan(
+                          style: ChronicleTextStyles.bodySmall(context),
+                          children: [
+                        TextSpan(text: "Voting Duration: "),
+                        TextSpan(
+                            text: "${state.votingDuration ~/ 60} minutes",
+                            style: ChronicleTextStyles.bodySmall(context)
+                                .copyWith(fontWeight: FontWeight.w500)),
+                      ])),
+                  ChronicleSpacing.verticalXS,
+                  RichText(
+                      text: TextSpan(
+                          style: ChronicleTextStyles.bodySmall(context),
+                          children: [
+                        TextSpan(text: "Rounds: "),
+                        TextSpan(
+                            text: "${state.rounds}",
+                            style: ChronicleTextStyles.bodySmall(context)
+                                .copyWith(fontWeight: FontWeight.w500)),
+                      ])),
+                  ChronicleSpacing.verticalLG,
+                  ParticipantsWidget(),
+                  const Spacer(),
+                  _buildStartGameButton(context, state),
+                ],
+              ),
       );
     });
   }
@@ -157,6 +163,7 @@ class GameWaitingPage extends StatelessWidget {
                         message: "At least 2 players required to start game.",
                       );
                     },
+          loading: state.status == GameStatus.loading,
           backgroundColor: AppColors.primary,
           text: "Start Game",
           textColor: AppColors.textColor,

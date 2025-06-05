@@ -1,4 +1,5 @@
 import 'package:chronicle/core/theme/app_colors.dart';
+import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/circle_user_avatar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
@@ -36,7 +37,10 @@ class HomePage extends StatelessWidget {
             ChronicleSpacing.horizontalSM,
             Text(
               state.userModel?.name ?? "",
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: ChronicleTextStyles.bodyLarge(context).copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: ChronicleTextStyles.lg,
+              ),
             )
           ],
         );
@@ -85,7 +89,7 @@ class HomePage extends StatelessWidget {
           DefaultButton(
             text: "Create new game",
             onPressed: () => context.push(CreateGamePage.route),
-            backgroundColor: AppColors.secondary,
+            backgroundColor: AppColors.primary,
             textColor: AppColors.textColor,
             padding: const EdgeInsets.symmetric(
                 vertical: ChronicleSpacing.md, horizontal: ChronicleSpacing.sm),
@@ -104,11 +108,29 @@ class HomePage extends StatelessWidget {
             content: Text("Are you sure you want to logout?"),
             actions: [
               TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor: AppColors.secondary),
                   onPressed: () => Navigator.pop(context),
                   child: Text("Cancel")),
+              // if logout is loading
+              if (context.read<UserBloc>().state.status == UserStatus.loading)
+                Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ),
+                ),
               ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.errorColor,
+                      foregroundColor: AppColors.surface),
                   onPressed: () {
                     context.read<UserBloc>().add(LogoutEvent());
+                    if (context.mounted) {
+                      ChronicleSnackBar.showSuccess(
+                        context: context,
+                        message: "Logged out successfully",
+                      );
+                    }
                     Navigator.pop(context);
                   },
                   child: Text("Logout"))

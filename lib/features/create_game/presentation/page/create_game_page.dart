@@ -72,18 +72,17 @@ class _CreateGamePageState extends State<CreateGamePage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
+                          horizontal: ChronicleSpacing.screenPadding,
+                          vertical: ChronicleSpacing.md),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               "Title",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              style: ChronicleTextStyles.bodyMedium(context)
+                                  .copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                             ChronicleSpacing.verticalSM,
                             DefaultTextField(
@@ -98,12 +97,10 @@ class _CreateGamePageState extends State<CreateGamePage> {
                             ChronicleSpacing.verticalMD,
                             Text(
                               "Rounds",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              style: ChronicleTextStyles.bodyMedium(context)
+                                  .copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ]),
                     ),
@@ -117,12 +114,13 @@ class _CreateGamePageState extends State<CreateGamePage> {
                     ChronicleSpacing.verticalLG,
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
+                          horizontal: ChronicleSpacing.screenPadding,
+                          vertical: ChronicleSpacing.md),
                       child: Text(
                         "Round duration (minutes)",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                        style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     ChronicleSpacing.verticalSM,
@@ -135,12 +133,13 @@ class _CreateGamePageState extends State<CreateGamePage> {
                     ChronicleSpacing.verticalLG,
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
+                          horizontal: ChronicleSpacing.screenPadding,
+                          vertical: ChronicleSpacing.md),
                       child: Text(
                         "Voting duration (minutes)",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                        style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     ChronicleSpacing.verticalSM,
@@ -153,12 +152,13 @@ class _CreateGamePageState extends State<CreateGamePage> {
                     ChronicleSpacing.verticalLG,
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
+                          horizontal: ChronicleSpacing.screenPadding,
+                          vertical: ChronicleSpacing.md),
                       child: Text(
                         "Maximum participants",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                        style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     ChronicleSpacing.verticalSM,
@@ -168,34 +168,34 @@ class _CreateGamePageState extends State<CreateGamePage> {
                       onNumberChanged: (value) =>
                           setState(() => maximumParticipants = value),
                     ),
-                    ChronicleSpacing.verticalXL,
+                    ChronicleSpacing.verticalLG,
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: DefaultButton(
-                        text: "Create",
-                        loading: state.status == CreateGameStatus.loading,
-                        onPressed: title.isEmpty
-                            ? () {
-                                ChronicleSnackBar.showError(
-                                  context: context,
-                                  message: "Game title cannot be empty.",
-                                );
-                              }
-                            : () {
-                                context.read<CreateGameBloc>().add(
-                                    CreateGameEvent(
-                                        title: title,
-                                        rounds: rounds,
-                                        roundDuration: roundDuration,
-                                        votingDuration: votingDuration,
-                                        maximumParticipants:
-                                            maximumParticipants));
-                              },
-                        backgroundColor: AppColors.secondary,
-                        textColor: AppColors.textColor,
+                          text: "Create",
+                          loading: state.status == CreateGameStatus.loading,
+                          onPressed: title.isEmpty
+                              ? () {
+                                  ChronicleSnackBar.showError(
+                                    context: context,
+                                    message: "Game title cannot be empty.",
+                                  );
+                                }
+                              : () {
+                                  context.read<CreateGameBloc>().add(
+                                      CreateGameEvent(
+                                          title: title,
+                                          rounds: rounds,
+                                          roundDuration: roundDuration,
+                                          votingDuration: votingDuration,
+                                          maximumParticipants:
+                                              maximumParticipants));
+                                },
+                          backgroundColor: AppColors.primary,
+                          textColor: AppColors.textColor,
                           padding: const EdgeInsets.symmetric(
-                              vertical: ChronicleSpacing.md, horizontal: ChronicleSpacing.sm)
-                      ),
+                              vertical: ChronicleSpacing.md,
+                              horizontal: ChronicleSpacing.sm)),
                     ),
                   ],
                 ),
