@@ -1,3 +1,4 @@
+import 'package:chronicle/core/socket_manager.dart';
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
@@ -6,6 +7,7 @@ import 'package:chronicle/core/utils/game_utils.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
+import 'package:chronicle/features/game/presentation/bloc/game_event.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
 import 'package:chronicle/features/game/presentation/widgets/gamecode_card_widget.dart';
 import 'package:chronicle/features/game/presentation/widgets/participants_widget.dart';
@@ -66,9 +68,12 @@ class GameWaitingPage extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     return BlocBuilder<GameBloc, GameState>(builder: (context, state) {
+      final socketManager = SocketManager();
+      final bool isLoading =
+          state.status == GameStatus.loading || !socketManager.isConnected;
       return Padding(
         padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-        child: state.status == GameStatus.loading
+        child: isLoading
             ? const Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
@@ -147,7 +152,7 @@ class GameWaitingPage extends StatelessWidget {
                   GameUtils.isCreator(
                       userState.userModel!, state.participants ?? [])
               ? () {
-                  // context.read<GameBloc>().add(StartGameEvent());
+                  context.read<GameBloc>().add(StartGameEvent());
                 }
               : !GameUtils.isCreator(
                       userState.userModel!, state.participants ?? [])

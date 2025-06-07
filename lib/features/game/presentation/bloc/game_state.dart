@@ -2,6 +2,7 @@ import 'package:chronicle/features/game/domain/model/game_phase_model.dart';
 import 'package:chronicle/features/game/domain/model/participant_model.dart';
 import 'package:chronicle/features/game/domain/model/story_fragment_model.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_event.dart';
+import 'package:equatable/equatable.dart';
 
 enum GameStatus {
   initial,
@@ -9,7 +10,6 @@ enum GameStatus {
   success,
   error,
 }
-
 
 class GameStateUpdatedEvent extends GameEvent {
   final String name;
@@ -46,7 +46,7 @@ class GameErrorEvent extends GameEvent {
   GameErrorEvent({required this.errorMessage});
 }
 
-class GameState {
+class GameState extends Equatable {
   final GameStatus status;
   final String? title;
   final String? gameCode;
@@ -62,7 +62,7 @@ class GameState {
   final List<StoryFragmentModel> history;
   final String? errorMessage;
 
-  GameState._({
+  const GameState._({
     required this.status,
     this.title,
     this.gameCode,
@@ -114,4 +114,22 @@ class GameState {
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
+
+  @override
+  List<Object?> get props => [
+        status,
+        title,
+        gameCode,
+        gameId,
+        gamePhase,
+        currentRound,
+        rounds,
+        votingDuration,
+        roundDuration,
+        remainingTime,
+        maximumParticipants,
+        participants,
+        history,
+        errorMessage,
+      ];
 }

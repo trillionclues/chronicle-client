@@ -25,4 +25,6 @@ abstract class GameRepository {
   Future<Either<Failure, void>> joinGame({
     required String gameCode,required GameUpdateCallback onUpdate,required ErrorCallback onError,
   });
+
+  Future<Either<Failure, void>> startGame(String gameId);
 }

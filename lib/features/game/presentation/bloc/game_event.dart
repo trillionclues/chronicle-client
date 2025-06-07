@@ -7,3 +7,5 @@ class JoinGameEvent extends GameEvent {
     required this.gameCode,
   });
 }
+
+class StartGameEvent extends GameEvent {}

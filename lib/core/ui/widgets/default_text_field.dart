@@ -9,8 +9,10 @@ class DefaultTextField extends StatelessWidget {
   final int? maxLines;
   final int? minLines;
   final int? maxLength;
+  final String? fieldType;
   final TextEditingController? controller;
   final Function(String)? onChanged;
+  final Function(String)? onSubmitted;
 
   const DefaultTextField({
     super.key,
@@ -19,6 +21,8 @@ class DefaultTextField extends StatelessWidget {
     this.borderRadius,
     this.maxLines,
     this.minLines,
+    this.fieldType = 'formField',
+    this.onSubmitted,
     this.maxLength,
     this.controller,
     this.onChanged,
@@ -26,13 +30,37 @@ class DefaultTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return fieldType == "formField" ? TextFormField(
       style: Theme.of(context).textTheme.bodyMedium,
       onChanged: onChanged,
       controller: controller,
       maxLines: maxLines,
       minLines: minLines,
       maxLength: maxLength,
+      decoration: InputDecoration(
+          fillColor: AppColors.surface,
+          filled: true,
+          counterStyle: Theme.of(context).textTheme.bodySmall,
+          hintText: hintText,
+          suffixIcon: Padding(
+            padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.md + 4),
+            child: actionIcon,
+          ),
+          hintStyle: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.copyWith(color: AppColors.textColor.withOpacity(0.5)),
+          contentPadding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.xl - 2, vertical: ChronicleSpacing.md),
+          border: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: borderRadius ?? BorderRadius.circular(40))),
+    ) : TextField(
+      style: Theme.of(context).textTheme.bodyMedium,
+      onChanged: onChanged,
+      controller: controller,
+      maxLines: 1,
+      minLines: minLines,
+      onSubmitted: onSubmitted,
       decoration: InputDecoration(
           fillColor: AppColors.surface,
           filled: true,

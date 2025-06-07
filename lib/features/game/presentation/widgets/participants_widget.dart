@@ -24,44 +24,46 @@ class ParticipantsWidget extends StatelessWidget {
             ),
           ),
           ChronicleSpacing.verticalSM,
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(ChronicleSpacing.md),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius:
-                  BorderRadius.circular(ChronicleSizes.smallBorderRadius),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                ...state.participants.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  ParticipantModel participant = entry.value;
-                  bool isLast = index == state.participants.length - 1;
+          SingleChildScrollView(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(ChronicleSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius:
+                    BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  ...state.participants.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    ParticipantModel participant = entry.value;
+                    bool isLast = index == state.participants.length - 1;
 
-                  return Column(
-                    children: [
-                      _buildPlayerTile(context, participant),
-                      if (!isLast)
-                        Divider(
-                          height: ChronicleSpacing.md * 2,
-                          thickness: 1,
-                          color:
-                              Theme.of(context).dividerColor.withOpacity(0.3),
-                        ),
-                    ],
-                  );
-                }),
-                if (state.participants.length < state.maximumParticipants)
-                  _buildEmptySlots(context, state),
-              ],
+                    return Column(
+                      children: [
+                        _buildPlayerTile(context, participant),
+                        if (!isLast)
+                          Divider(
+                            height: ChronicleSpacing.md * 2,
+                            thickness: 1,
+                            color:
+                                Theme.of(context).dividerColor.withOpacity(0.3),
+                          ),
+                      ],
+                    );
+                  }),
+                  if (state.participants.length < state.maximumParticipants)
+                    _buildEmptySlots(context, state),
+                ],
+              ),
             ),
           )
         ],
@@ -198,51 +200,53 @@ class ParticipantsWidget extends StatelessWidget {
 
   Widget _buildEmptySlot(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: ChronicleSpacing.xs),
-      child: Padding(padding: EdgeInsets.symmetric(
-        vertical: ChronicleSpacing.xs,
-      ),child: Row(
-        children: [
-          Container(
-            width: ChronicleSizes.iconXLarge,
-            height: ChronicleSizes.iconXLarge,
-            decoration: BoxDecoration(
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Theme.of(context).dividerColor.withOpacity(0.3),
-                width: ChronicleSpacing.xs - 3,
-                strokeAlign: BorderSide.strokeAlignInside,
-              ),
-            ),
-            child: Icon(
-              Icons.person_add_alt_1_outlined,
-              color: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.color
-                  ?.withOpacity(0.4),
-              size: ChronicleSizes.iconMedium,
-            ),
+        padding: EdgeInsets.symmetric(vertical: ChronicleSpacing.xs),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: ChronicleSpacing.xs,
           ),
-          ChronicleSpacing.horizontalMD,
+          child: Row(
+            children: [
+              Container(
+                width: ChronicleSizes.iconXLarge,
+                height: ChronicleSizes.iconXLarge,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).dividerColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor.withOpacity(0.3),
+                    width: ChronicleSpacing.xs - 3,
+                    strokeAlign: BorderSide.strokeAlignInside,
+                  ),
+                ),
+                child: Icon(
+                  Icons.person_add_alt_1_outlined,
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.color
+                      ?.withOpacity(0.4),
+                  size: ChronicleSizes.iconMedium,
+                ),
+              ),
+              ChronicleSpacing.horizontalMD,
 
-          // Waiting text
-          Expanded(
-            child: Text(
-              "Waiting for player...",
-              style: ChronicleTextStyles.bodyMedium(context).copyWith(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.color
-                    ?.withOpacity(0.5),
-                fontStyle: FontStyle.italic,
+              // Waiting text
+              Expanded(
+                child: Text(
+                  "Waiting for player...",
+                  style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.color
+                        ?.withOpacity(0.5),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),)
-    );
+        ));
   }
 }

@@ -14,6 +14,10 @@ import 'package:chronicle/features/game/data/datasource/game_remote_datasource.d
 import 'package:chronicle/features/game/data/repository/game_repository_impl.dart';
 import 'package:chronicle/features/game/domain/game_repository.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
+import 'package:chronicle/features/home/data/datasource/home_remote_datasource.dart';
+import 'package:chronicle/features/home/data/datasource/repository/home_repository_impl.dart';
+import 'package:chronicle/features/home/domain/repository/home_repository.dart';
+import 'package:chronicle/features/home/presentation/bloc/home_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -40,6 +44,7 @@ void registerDataSource() {
       CreateGameRemoteDatasource(dio: dioWithTokenInterceptor));
 
   getIt.registerSingleton(GameRemoteDatasource());
+  getIt.registerSingleton(HomeRemoteDataSource(dio: dioWithTokenInterceptor));
 }
 
 void registerRepository() {
@@ -54,6 +59,10 @@ void registerRepository() {
 
   getIt.registerSingleton<GameRepository>(
       GameRepositoryImpl(gameRemoteDatasource: getIt()));
+
+  getIt.registerSingleton<HomeRepository>(
+    HomeRepositoryImpl(homeRemoteDataSource: getIt()),
+  );
 }
 
 void registerBloc() {
@@ -63,4 +72,6 @@ void registerBloc() {
   getIt.registerFactory(() => CreateGameBloc(createGameRepository: getIt()));
 
   getIt.registerFactory(() => GameBloc(gameRepository: getIt()));
+
+  getIt.registerFactory(() => HomeBloc(homeRepository: getIt()));
 }
