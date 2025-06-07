@@ -27,4 +27,6 @@ abstract class GameRepository {
   });
 
   Future<Either<Failure, void>> startGame(String gameId);
+
+  Future<Either<Failure, void>> cancelGame(String gameId);
 }

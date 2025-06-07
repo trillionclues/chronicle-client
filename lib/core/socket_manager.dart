@@ -297,7 +297,6 @@ class SocketManager {
       log('❌ Cannot join game: Socket not connected or disposed');
       return;
     }
-
     _socket?.emit('joinGameByCode', gameCode);
   }
 

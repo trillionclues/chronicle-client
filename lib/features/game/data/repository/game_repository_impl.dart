@@ -29,4 +29,13 @@ class GameRepositoryImpl implements GameRepository {
       return Either.left(GameFailure(message: "Start game error!"));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> cancelGame(String gameId) async {
+    try {
+      return Either.right(gameRemoteDatasource.cancelGame(gameId));
+    } catch (e) {
+      return Either.left(GameFailure(message: "Cancel game error!"));
+    }
+  }
 }

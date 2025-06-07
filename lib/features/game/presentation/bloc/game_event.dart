@@ -9,3 +9,4 @@ class JoinGameEvent extends GameEvent {
 }
 
 class StartGameEvent extends GameEvent {}
+class CancelGameEvent extends GameEvent {}

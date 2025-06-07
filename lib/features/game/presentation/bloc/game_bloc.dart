@@ -17,6 +17,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   GameBloc({required this.gameRepository}) : super(GameState.initial()) {
     on<JoinGameEvent>(_onJoinGameEvent);
     on<StartGameEvent>(_onStartGameEvent);
+    on<CancelGameEvent>(_onCancelGameEvent);
     on<GameStateUpdatedEvent>(_onGameStateUpdateEvent);
     on<GameErrorEvent>(_onGameErrorEvent);
     on<DisposeGameEvent>(_onDisposeGameEvent);
@@ -62,6 +63,25 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         emit(state.copyWith(
           status: GameStatus.error,
           errorMessage: 'Failed to start game: $e',
+        ));
+      }
+    }
+  }
+
+  Future<void> _onCancelGameEvent(
+      CancelGameEvent event, Emitter<GameState> emit) async {
+    if (_disposed) return;
+
+    try {
+      if (state.gameId != null) {
+        emit(state.copyWith(status: GameStatus.loading));
+        await gameRepository.cancelGame(state.gameId!);
+      }
+    } catch (e) {
+      if (!_disposed) {
+        emit(state.copyWith(
+          status: GameStatus.error,
+          errorMessage: 'Failed to cancel game: $e',
         ));
       }
     }

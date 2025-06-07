@@ -29,38 +29,50 @@ class GameWaitingPage extends StatelessWidget {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      title: Row(
-        children: [
-          IconButton(
-              onPressed: () {
-                context.pop();
-              },
-              icon: Icon(
-                Icons.chevron_left,
-                size: ChronicleSizes.iconLarge,
-              )),
-          ChronicleSpacing.horizontalSM,
-          Text(
-            "Waiting for players...",
-            style: ChronicleTextStyles.bodyLarge(context),
-          ),
-          const Spacer(),
-          TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.sm),
-              textStyle: ChronicleTextStyles.bodyLarge(context).copyWith(
-                color: AppColors.errorColor,
+      title: BlocBuilder<GameBloc, GameState>(builder: (context, state) {
+        return BlocBuilder<UserBloc, UserState>(builder: (context, userState) {
+          final isCreator = userState.userModel != null &&
+              state.participants != null &&
+              state.participants!.isNotEmpty &&
+              GameUtils.isCreator(userState.userModel!, state.participants!);
+          return Row(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  icon: Icon(
+                    Icons.chevron_left,
+                    size: ChronicleSizes.iconLarge,
+                  )),
+              ChronicleSpacing.horizontalSM,
+              Text(
+                "Waiting for players...",
+                style: ChronicleTextStyles.bodyLarge(context),
               ),
-              foregroundColor: AppColors.errorColor,
-              alignment: Alignment.center,
-            ),
-            child: Text(
-              "Cancel Game",
-            ),
-          )
-        ],
-      ),
+              const Spacer(),
+              if (isCreator)
+                TextButton(
+                  onPressed: () {
+                    context.read<GameBloc>().add(CancelGameEvent());
+                  },
+                  style: TextButton.styleFrom(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: ChronicleSpacing.sm),
+                    textStyle: ChronicleTextStyles.bodyLarge(context).copyWith(
+                      color: AppColors.errorColor,
+                    ),
+                    foregroundColor: AppColors.errorColor,
+                    alignment: Alignment.center,
+                  ),
+                  child: Text(
+                    "Cancel Game",
+                  ),
+                )
+            ],
+          );
+        });
+      }),
       titleSpacing: 0,
       toolbarHeight: ChronicleSizes.appBarHeight,
     );
