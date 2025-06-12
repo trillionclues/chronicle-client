@@ -9,13 +9,21 @@ class GameRepositoryImpl implements GameRepository {
   GameRepositoryImpl({required this.gameRemoteDatasource});
 
   @override
-  Future<Either<Failure, void>> joinGame(
-      {required String gameCode,
-      required GameUpdateCallback onUpdate,
-      required ErrorCallback onError}) async {
+  Future<Either<Failure, void>> joinGame({
+    required String gameCode,
+    required GameUpdateCallback onUpdate,
+    required ErrorCallback onError,
+    required KickedCallback onKicked,
+    required LeftCallback onLeft,
+  }) async {
     try {
       return Either.right(gameRemoteDatasource.joinGame(
-          gameCode: gameCode, onUpdate: onUpdate, onError: onError));
+        gameCode: gameCode,
+        onUpdate: onUpdate,
+        onError: onError,
+        onKicked: onKicked,
+        onLeft: onLeft,
+      ));
     } catch (e) {
       return Either.left(GameFailure(message: "Join game error!"));
     }
@@ -36,6 +44,25 @@ class GameRepositoryImpl implements GameRepository {
       return Either.right(gameRemoteDatasource.cancelGame(gameId));
     } catch (e) {
       return Either.left(GameFailure(message: "Cancel game error!"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> kickParticipant(
+      String gameId, String userId) async {
+    try {
+      return Either.right(gameRemoteDatasource.kickParticipant(gameId, userId));
+    } catch (e) {
+      return Either.left(GameFailure(message: "Kick participant error!"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> leaveGame(String gameId) async {
+    try {
+      return Either.right(gameRemoteDatasource.leaveGame(gameId));
+    } catch (e) {
+      return Either.left(GameFailure(message: "Leave game error!"));
     }
   }
 }

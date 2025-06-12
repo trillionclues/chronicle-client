@@ -5,12 +5,14 @@ class ChronicleSnackBarContent extends StatelessWidget {
   final String message;
   final ChronicleSnackBarType type;
   final SnackBarTheme theme;
+  final VoidCallback? onDismiss;
 
   const ChronicleSnackBarContent({
     super.key,
     required this.message,
     required this.type,
     required this.theme,
+    this.onDismiss,
   });
 
   @override
@@ -61,14 +63,18 @@ class ChronicleSnackBarContent extends StatelessWidget {
                 ),
               ),
             ),
-            GestureDetector(
+            InkWell(
               onTap: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                onDismiss?.call();
               },
-              child: Icon(
-                Icons.close,
-                color: theme.textColor,
-                size: 20,
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: Icon(
+                  Icons.close,
+                  color: theme.textColor,
+                  size: 20,
+                ),
               ),
             ),
           ],

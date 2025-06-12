@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chronicle/core/socket_manager.dart';
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
@@ -154,8 +156,13 @@ class GameWaitingPage extends StatelessWidget {
 
   Widget _buildStartGameButton(BuildContext context, GameState state) {
     final canStartGame = state.participants.length >= 2;
+    final participants = state.participants ?? [];
 
     return BlocBuilder<UserBloc, UserState>(builder: (context, userState) {
+      final user = userState.userModel;
+      log(
+          "User: ${userState.userModel?.name}, Participants: ${state.participants.length}, Can Start Game: $canStartGame"
+      );
       return SizedBox(
         width: double.infinity,
         height: ChronicleSizes.buttonHeight,

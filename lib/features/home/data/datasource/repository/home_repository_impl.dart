@@ -14,10 +14,10 @@ class HomeRepositoryImpl extends HomeRepository {
 
   @override
   Future<Either<Failure, GameModel>> checkGameByCode(String gameCode) async {
-    var result = await homeRemoteDataSource.checkGameByCode(gameCode);
-    return Either.right(result);
-    try {
 
+    try {
+      var result = await homeRemoteDataSource.checkGameByCode(gameCode);
+      return Either.right(result);
     } on DioException catch (e) {
       return Either.left(GameFailure(message: e.response?.data['error']));
     } catch (e) {

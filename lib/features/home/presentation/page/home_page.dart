@@ -164,7 +164,7 @@ class _HomePageState extends State<HomePage> {
               text: "Create new game",
               onPressed: () => context.push(CreateGamePage.route),
               backgroundColor: AppColors.primary,
-              textColor: AppColors.textColor,
+              textColor: AppColors.surface,
               padding: const EdgeInsets.symmetric(
                   vertical: ChronicleSpacing.md,
                   horizontal: ChronicleSpacing.sm),

@@ -131,7 +131,7 @@ class ChronicleSnackBar {
       case ChronicleSnackBarType.warning:
         return SnackBarTheme(
           backgroundColor: const Color(0xFFF59E0B),
-          textColor:AppColors.surface,
+          textColor: AppColors.surface,
           icon: Icons.warning_outlined,
           actionColor: Colors.white,
           borderColor: const Color(0xFFD97706),
@@ -264,10 +264,10 @@ class _TopSnackBarWidgetState extends State<_TopSnackBarWidget>
             borderRadius: BorderRadius.circular(12),
             color: widget.theme.backgroundColor,
             child: ChronicleSnackBarContent(
-              message: widget.message,
-              type: widget.type,
-              theme: widget.theme,
-            ),
+                message: widget.message,
+                type: widget.type,
+                theme: widget.theme,
+                onDismiss: _dismiss),
           ),
         ),
       ),

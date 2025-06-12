@@ -36,7 +36,7 @@ class AuthPage extends StatelessWidget {
                 padding:
                     EdgeInsets.symmetric(vertical: ChronicleSpacing.sm + 2),
                 child: Text(
-                  "Collaborate with friends and craft unique stories.",
+                  "Collaborate with friends and craft unique stories together.",
                   textAlign: TextAlign.center,
                   style: ChronicleTextStyles.bodyLarge(context).copyWith(
                     fontWeight: FontWeight.w500,

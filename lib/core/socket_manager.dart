@@ -11,10 +11,12 @@ class SocketManager {
 
   IO.Socket? _socket;
   Timer? _reconnectTimer;
+  Timer? _keepAliveTimer;
   bool _isConnecting = false;
   bool _isReconnecting = false;
   bool _isDisposed = false;
   String? _currentGameId;
+  String? _baseUrl;
 
   StreamController<bool>? _connectionController;
   Stream<bool> get connectionStream =>
@@ -27,12 +29,15 @@ class SocketManager {
     required Function(Map<String, dynamic>) onGameStateUpdate,
     required Function(String) onError,
     required Function(String) onJoined,
+    required Function() onKicked,
+    required Function() onLeft,
   }) async {
     if (_isConnecting || _isDisposed) {
       log('⚠️ Already connecting or disposed, skipping...');
       return;
     }
     _isConnecting = true;
+    _baseUrl = baseUrl;
 
     try {
       // Initialize connection controller if not exists or closed
@@ -45,107 +50,142 @@ class SocketManager {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         _isConnecting = false;
+        onError('User not authenticated');
         return;
       }
 
       final token = await user.getIdToken(true);
-      if (token!.isEmpty) {
+      if (token == null || token.isEmpty) {
         _isConnecting = false;
+        onError('Failed to get authentication token');
         return;
       }
 
-      log('Connecting to socket with URL: $baseUrl');
-      log('User ID: ${user.uid}');
-
+      // Create socket with comprehensive options
       final socketOptions = IO.OptionBuilder()
-          .setExtraHeaders({'authorization': token})
           .setTransports(['websocket', 'polling'])
           .enableAutoConnect()
           .setTimeout(15000)
           .enableReconnection()
           .setReconnectionAttempts(3)
-          .setReconnectionDelay(2000)
+          .setReconnectionDelay(1000)
           .setReconnectionDelayMax(5000)
+          .setExtraHeaders({
+            'Authorization': 'Bearer $token',
+          })
           .build();
 
       _socket = IO.io(baseUrl, socketOptions);
-      _setupEventListeners(onGameStateUpdate, onError, onJoined);
 
-      // Use a completer to properly handle connection timeout
+      log('🚀 Socket instance created, setting up listeners...');
+      _setupEventListeners(
+          onGameStateUpdate, onError, onJoined, onKicked, onLeft);
+
+      // Enhanced connection handling with detailed logging
       final completer = Completer<bool>();
       Timer? timeoutTimer;
+      bool connectionAttempted = false;
 
-      late StreamSubscription connectSub;
-      late StreamSubscription errorSub;
-
-      connectSub = _socket!.onConnect((_) {
+      // Connection success handler
+      _socket!.onConnect((_) {
+        log('✅ Socket connected successfully!');
+        connectionAttempted = true;
         if (!completer.isCompleted) {
           completer.complete(true);
           timeoutTimer?.cancel();
-          connectSub.cancel();
-          errorSub.cancel();
-        }
-      }) as StreamSubscription;
-
-      errorSub = _socket!.onConnectError((error) {
-        if (!completer.isCompleted) {
-          completer.complete(false);
-          timeoutTimer?.cancel();
-          connectSub.cancel();
-          errorSub.cancel();
-        }
-      }) as StreamSubscription;
-
-      timeoutTimer = Timer(const Duration(seconds: 10), () {
-        if (!completer.isCompleted) {
-          completer.complete(false);
-          connectSub.cancel();
-          errorSub.cancel();
         }
       });
 
+      // Connection error handler
+      _socket!.onConnectError((error) {
+        log('❌ Socket connection error: $error');
+        connectionAttempted = true;
+        if (!completer.isCompleted) {
+          completer.complete(false);
+          timeoutTimer?.cancel();
+        }
+      });
+
+      // Disconnect handler (for immediate disconnections)
+      _socket!.onDisconnect((reason) {
+        log('🔌 Socket disconnected during connection: $reason');
+        if (!connectionAttempted && !completer.isCompleted) {
+          completer.complete(false);
+          timeoutTimer?.cancel();
+        }
+      });
+
+      // Timeout handler
+      timeoutTimer = Timer(const Duration(seconds: 20), () {
+        log('⏰ Socket connection timeout after 20 seconds');
+        if (!completer.isCompleted) {
+          completer.complete(false);
+        }
+      });
+
+      log('🔄 Initiating socket connection...');
       _socket!.connect();
+
+      // Wait for connection result
       final connected = await completer.future;
       _isConnecting = false;
 
-      if (!connected && !_isDisposed) {
-        onError('Connection timeout');
+      if (connected && !_isDisposed) {
+        log('🎉 Socket connection established successfully');
+        _startKeepAlive();
+      } else if (!_isDisposed) {
+        log('💥 Socket connection failed');
+        onError(
+            'Failed to connect to game server. Please check your internet connection and try again.');
         await _disconnect();
       }
-    } catch (e) {
-      log('Socket connection error: $e');
+    } catch (e, stackTrace) {
+      log('🚨 Socket connection exception: $e');
+      log('📍 Stack trace: $stackTrace');
       if (!_isDisposed) {
-        onError('Failed to connect: $e');
+        onError('Connection error: $e');
       }
       _isConnecting = false;
     }
   }
 
   void _setupEventListeners(
-      Function(Map<String, dynamic>) onGameStateUpdate,
-      Function(String) onError,
-      Function(String) onJoined,
-      ) {
+    Function(Map<String, dynamic>) onGameStateUpdate,
+    Function(String) onError,
+    Function(String) onJoined,
+    Function() onKicked,
+    Function() onLeft,
+  ) {
     if (_socket == null) return;
 
+    log('🎧 Setting up socket event listeners...');
+
     _socket!.onConnect((_) {
-      log('✅ Socket connected successfully');
+      log('✅ Socket connected - setting up streams');
       _isConnecting = false;
       _isReconnecting = false;
       _reconnectTimer?.cancel();
       _safeAddToStream(_connectionController, true);
+      _startKeepAlive();
     });
 
     _socket!.onDisconnect((reason) {
       log('❌ Socket disconnected: $reason');
       _safeAddToStream(_connectionController, false);
-      if (!_isReconnecting && !_isDisposed && reason != 'io client disconnect') {
-        _attemptReconnect(onGameStateUpdate, onError, onJoined);
+      _keepAliveTimer?.cancel();
+
+      // Only attempt reconnection for unexpected disconnections
+      if (!_isReconnecting &&
+          !_isDisposed &&
+          reason != 'io client disconnect') {
+        log('🔄 Scheduling reconnection due to: $reason');
+        _attemptReconnect(
+            onGameStateUpdate, onError, onJoined, onKicked, onLeft);
       }
     });
 
     _socket!.onConnectError((error) {
-      log('❌ Socket connection error: $error');
+      log('❌ Socket connection error in listener: $error');
       _safeAddToStream(_connectionController, false);
       if (!_isDisposed) {
         onError('Connection error: $error');
@@ -153,19 +193,21 @@ class SocketManager {
     });
 
     _socket!.onError((error) {
+      log('❌ Socket error: $error');
       if (!_isDisposed) {
         onError('Socket error: $error');
       }
     });
 
+    // Game-specific event handlers
     _socket!.on('gameStateUpdate', (data) {
       if (_isDisposed) return;
       try {
-        log('📡 Received gameStateUpdate: $data');
+        log('📡 Received gameStateUpdate');
         if (data is Map<String, dynamic>) {
           onGameStateUpdate(data);
         } else {
-          log('⚠️ Invalid gameStateUpdate data format: $data');
+          log('⚠️ Invalid gameStateUpdate format: ${data.runtimeType}');
         }
       } catch (e) {
         log('Error handling gameStateUpdate: $e');
@@ -175,10 +217,14 @@ class SocketManager {
     _socket!.on('joined', (data) {
       if (_isDisposed) return;
       try {
-        log('✅ Joined game: $data');
-        if (data is Map<String, dynamic> && data['gameId'] != null) {
-          _currentGameId = data['gameId'].toString();
+        log('✅ Received joined event: $data');
+        if (data is Map<String, dynamic>) {
+          if (data['gameId'] != null) {
+            _currentGameId = data['gameId'].toString();
+          }
           onJoined(data['message'] ?? 'Joined successfully');
+        } else if (data is String) {
+          onJoined(data);
         }
       } catch (e) {
         log('Error handling joined event: $e');
@@ -188,7 +234,7 @@ class SocketManager {
     _socket!.on('error', (data) {
       if (_isDisposed) return;
       try {
-        log('❌ Game error: $data');
+        log('❌ Received error event: $data');
         String errorMessage = 'Unknown error';
         if (data is Map<String, dynamic> && data['message'] != null) {
           errorMessage = data['message'];
@@ -204,8 +250,8 @@ class SocketManager {
     _socket!.on('kicked', (data) {
       if (_isDisposed) return;
       try {
-        log('👢 Kicked from game: $data');
-        onError('You have been kicked from the game');
+        log('👢 Received kicked event: $data');
+        onKicked();
       } catch (e) {
         log('Error handling kicked event: $e');
       }
@@ -214,10 +260,30 @@ class SocketManager {
     _socket!.on('gameEnded', (data) {
       if (_isDisposed) return;
       try {
-        log('🏁 Game ended: $data');
-        onError('Game has ended');
+        log('🏁 Received gameEnded event: $data');
+        onLeft();
       } catch (e) {
         log('Error handling gameEnded event: $e');
+      }
+    });
+
+    // Debug events
+    _socket!.on('connect', (_) => log('🔗 Connect event fired'));
+    _socket!.on(
+        'disconnect', (reason) => log('🔌 Disconnect event fired: $reason'));
+    _socket!.on('reconnect', (_) => log('🔄 Reconnect event fired'));
+    _socket!.on('reconnect_error', (error) => log('❌ Reconnect error: $error'));
+    _socket!.on('reconnect_failed', (_) => log('💥 Reconnect failed'));
+
+    log('✅ All event listeners set up');
+  }
+
+  void _startKeepAlive() {
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (_socket?.connected == true && !_isDisposed) {
+        _socket?.emit('ping');
+        log('📡 Keep-alive ping sent');
       }
     });
   }
@@ -233,23 +299,26 @@ class SocketManager {
   }
 
   void _attemptReconnect(
-      Function(Map<String, dynamic>) onGameStateUpdate,
-      Function(String) onError,
-      Function(String) onJoined,
-      ) {
+    Function(Map<String, dynamic>) onGameStateUpdate,
+    Function(String) onError,
+    Function(String) onJoined,
+    Function() onKicked,
+    Function() onLeft,
+  ) {
     if (_isReconnecting || _isDisposed) return;
     _isReconnecting = true;
 
     log('🔄 Starting reconnection attempts...');
 
     int attempts = 0;
-    _reconnectTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+    _reconnectTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
       if (_isDisposed) {
         timer.cancel();
         return;
       }
 
       attempts++;
+      log('🔄 Reconnection attempt $attempts/5');
 
       if (_socket?.connected == true) {
         log('✅ Reconnection successful');
@@ -257,25 +326,33 @@ class SocketManager {
         _isReconnecting = false;
 
         if (_currentGameId != null) {
+          log('🎮 Rejoining game: $_currentGameId');
           joinGame(_currentGameId!);
         }
-      } else if (attempts <= 3) {
-        log('🔄 Reconnection attempt $attempts');
-
+      } else if (attempts <= 5) {
         try {
-          final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
-          if (token != null && !_isDisposed) {
-            _socket?.io.options?['extraHeaders'] = {'authorization': token};
-            _socket?.connect();
+          // Create a completely new connection
+          await connect(
+            baseUrl: _baseUrl!,
+            onGameStateUpdate: onGameStateUpdate,
+            onError: onError,
+            onJoined: onJoined,
+            onKicked: onKicked,
+            onLeft: onLeft,
+          );
+
+          if (_socket?.connected == true) {
+            timer.cancel();
+            _isReconnecting = false;
           }
         } catch (e) {
-          log('Failed to refresh token for reconnection: $e');
+          log('Failed reconnection attempt $attempts: $e');
         }
       } else {
         timer.cancel();
         _isReconnecting = false;
         if (!_isDisposed) {
-          onError('Failed to reconnect after multiple attempts');
+          onError('Failed to reconnect after 5 attempts');
         }
       }
     });
@@ -294,9 +371,10 @@ class SocketManager {
 
   void joinGameByCode(String gameCode) {
     if (!isConnected || _isDisposed) {
-      log('❌ Cannot join game: Socket not connected or disposed');
+      log('❌ Cannot join game by code: Socket not connected or disposed');
       return;
     }
+    log('🎮 Joining game by code: $gameCode');
     _socket?.emit('joinGameByCode', gameCode);
   }
 
@@ -319,6 +397,13 @@ class SocketManager {
     _currentGameId = null;
   }
 
+  void kickParticipant(String gameId, String userId) {
+    if (!isConnected || _isDisposed) return;
+    log('👢 Kicking participant: $userId from game: $gameId');
+    _socket
+        ?.emit('kickParticipant', {'gameId': gameId, 'participantId': userId});
+  }
+
   void submitText(String gameId, String text) {
     if (!isConnected || _isDisposed) return;
     log('📝 Submitting text for game: $gameId');
@@ -334,12 +419,14 @@ class SocketManager {
   Future<void> _disconnect() async {
     try {
       _reconnectTimer?.cancel();
+      _keepAliveTimer?.cancel();
       _socket?.clearListeners();
       _socket?.disconnect();
       _socket?.dispose();
       _socket = null;
       _currentGameId = null;
       _safeAddToStream(_connectionController, false);
+      log('🔌 Socket disconnected and cleaned up');
     } catch (e) {
       log('Error disconnecting socket: $e');
     }
@@ -348,6 +435,7 @@ class SocketManager {
   Future<void> dispose() async {
     if (_isDisposed) return;
 
+    log('🗑️ Disposing SocketManager');
     _isDisposed = true;
 
     await _disconnect();

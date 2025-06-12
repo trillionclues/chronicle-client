@@ -21,12 +21,18 @@ required List<StoryFragmentModel> history,
 
 typedef ErrorCallback = Function(String errorMessage);
 
+typedef KickedCallback = Function();
+typedef LeftCallback = Function();
+
 abstract class GameRepository {
   Future<Either<Failure, void>> joinGame({
-    required String gameCode,required GameUpdateCallback onUpdate,required ErrorCallback onError,
+    required String gameCode,required GameUpdateCallback onUpdate,required ErrorCallback onError, required KickedCallback onKicked, required LeftCallback onLeft,
   });
 
   Future<Either<Failure, void>> startGame(String gameId);
 
   Future<Either<Failure, void>> cancelGame(String gameId);
+
+  Future<Either<Failure, void>> kickParticipant(String gameId, String userId);
+  Future<Either<Failure, void>> leaveGame(String gameId);
 }

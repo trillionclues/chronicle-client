@@ -192,7 +192,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
                                               maximumParticipants));
                                 },
                           backgroundColor: AppColors.primary,
-                          textColor: AppColors.textColor,
+                          textColor: AppColors.surface,
                           padding: const EdgeInsets.symmetric(
                               vertical: ChronicleSpacing.md,
                               horizontal: ChronicleSpacing.sm)),

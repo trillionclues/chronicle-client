@@ -20,6 +20,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<CancelGameEvent>(_onCancelGameEvent);
     on<GameStateUpdatedEvent>(_onGameStateUpdateEvent);
     on<GameErrorEvent>(_onGameErrorEvent);
+    on<GameKickedEvent>(_onGameKickedEvent);
+    on<GameLeftEvent>(_onGameLeftEvent);
     on<DisposeGameEvent>(_onDisposeGameEvent);
   }
 
@@ -34,6 +36,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         gameCode: event.gameCode,
         onUpdate: _onGameUpdate,
         onError: _onErrorCallback,
+        onKicked: _onKickedCallback,
+        onLeft: _onLeftCallback,
       );
     } catch (e) {
       if (!_disposed) {
@@ -118,6 +122,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     ));
   }
 
+  void _onGameKickedEvent(GameKickedEvent event, Emitter<GameState> emit) {}
+  void _onGameLeftEvent(GameLeftEvent event, Emitter<GameState> emit) {}
+
   void _onDisposeGameEvent(DisposeGameEvent event, Emitter<GameState> emit) {
     _disposed = true;
     _gameSubscription?.cancel();
@@ -165,6 +172,24 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       add(GameErrorEvent(errorMessage: errorMessage));
     } catch (e) {
       log('❌ GameBloc: Error adding error event: $e');
+    }
+  }
+
+  void _onKickedCallback() {
+    if (_disposed) return;
+    try {
+      add(GameKickedEvent());
+    } catch (e) {
+      log('❌ GameBloc: Error adding kicked event: $e');
+    }
+  }
+
+  void _onLeftCallback() {
+    if (_disposed) return;
+    try {
+      add(GameLeftEvent());
+    } catch (e) {
+      log('❌ GameBloc: Error adding kicked event: $e');
     }
   }
 

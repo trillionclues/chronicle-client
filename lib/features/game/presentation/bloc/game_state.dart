@@ -46,6 +46,10 @@ class GameErrorEvent extends GameEvent {
   GameErrorEvent({required this.errorMessage});
 }
 
+class GameKickedEvent extends GameEvent {}
+
+class GameLeftEvent extends GameEvent {}
+
 class GameState extends Equatable {
   final GameStatus status;
   final String? title;
