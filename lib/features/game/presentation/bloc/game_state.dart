@@ -9,6 +9,8 @@ enum GameStatus {
   loading,
   success,
   error,
+  leftGame,
+  kicked,
 }
 
 class GameStateUpdatedEvent extends GameEvent {
@@ -45,10 +47,6 @@ class GameErrorEvent extends GameEvent {
   final String errorMessage;
   GameErrorEvent({required this.errorMessage});
 }
-
-class GameKickedEvent extends GameEvent {}
-
-class GameLeftEvent extends GameEvent {}
 
 class GameState extends Equatable {
   final GameStatus status;

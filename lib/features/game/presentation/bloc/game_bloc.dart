@@ -20,8 +20,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<CancelGameEvent>(_onCancelGameEvent);
     on<GameStateUpdatedEvent>(_onGameStateUpdateEvent);
     on<GameErrorEvent>(_onGameErrorEvent);
-    on<GameKickedEvent>(_onGameKickedEvent);
-    on<GameLeftEvent>(_onGameLeftEvent);
+    on<KickParticipantGameEvent>(_onKickParticipantEvent);
+    on<LeaveGameEvent>(_onGameLeaveEvent);
     on<DisposeGameEvent>(_onDisposeGameEvent);
   }
 
@@ -122,8 +122,29 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     ));
   }
 
-  void _onGameKickedEvent(GameKickedEvent event, Emitter<GameState> emit) {}
-  void _onGameLeftEvent(GameLeftEvent event, Emitter<GameState> emit) {}
+  void _onKickParticipantEvent(
+      KickParticipantGameEvent event, Emitter<GameState> emit) {
+    if (_disposed) return;
+
+    if (state.gameId != null) {
+      gameRepository.kickParticipant(state.gameId!, event.userId);
+    }
+
+    emit(state.copyWith(
+        status: GameStatus.kicked,
+        errorMessage: 'You have been kicked from the game.'));
+  }
+
+  void _onGameLeaveEvent(LeaveGameEvent event, Emitter<GameState> emit) {
+    if (_disposed) return;
+
+    if (state.gameId != null) {
+      gameRepository.leaveGame(state.gameId!);
+    }
+
+    emit(state.copyWith(
+        status: GameStatus.leftGame, errorMessage: 'You have left the game.'));
+  }
 
   void _onDisposeGameEvent(DisposeGameEvent event, Emitter<GameState> emit) {
     _disposed = true;
@@ -178,7 +199,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   void _onKickedCallback() {
     if (_disposed) return;
     try {
-      add(GameKickedEvent());
+      if (state.gameId != null) {
+        add(KickParticipantGameEvent(userId: state.gameId!));
+      }
     } catch (e) {
       log('❌ GameBloc: Error adding kicked event: $e');
     }
@@ -187,7 +210,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   void _onLeftCallback() {
     if (_disposed) return;
     try {
-      add(GameLeftEvent());
+      add(LeaveGameEvent());
     } catch (e) {
       log('❌ GameBloc: Error adding kicked event: $e');
     }

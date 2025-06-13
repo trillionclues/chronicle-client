@@ -9,4 +9,13 @@ class JoinGameEvent extends GameEvent {
 }
 
 class StartGameEvent extends GameEvent {}
+
 class CancelGameEvent extends GameEvent {}
+
+class KickParticipantGameEvent extends GameEvent {
+  final String userId;
+
+  KickParticipantGameEvent({required this.userId});
+}
+
+class LeaveGameEvent extends GameEvent {}

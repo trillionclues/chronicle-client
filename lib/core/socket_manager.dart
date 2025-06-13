@@ -88,7 +88,6 @@ class SocketManager {
 
       // Connection success handler
       _socket!.onConnect((_) {
-        log('✅ Socket connected successfully!');
         connectionAttempted = true;
         if (!completer.isCompleted) {
           completer.complete(true);
@@ -251,29 +250,21 @@ class SocketManager {
       if (_isDisposed) return;
       try {
         log('👢 Received kicked event: $data');
-        onKicked();
+        onKicked.call();
       } catch (e) {
         log('Error handling kicked event: $e');
       }
     });
 
-    _socket!.on('gameEnded', (data) {
+    _socket!.on('leftGame', (data) {
       if (_isDisposed) return;
       try {
         log('🏁 Received gameEnded event: $data');
-        onLeft();
+        onLeft.call();
       } catch (e) {
         log('Error handling gameEnded event: $e');
       }
     });
-
-    // Debug events
-    _socket!.on('connect', (_) => log('🔗 Connect event fired'));
-    _socket!.on(
-        'disconnect', (reason) => log('🔌 Disconnect event fired: $reason'));
-    _socket!.on('reconnect', (_) => log('🔄 Reconnect event fired'));
-    _socket!.on('reconnect_error', (error) => log('❌ Reconnect error: $error'));
-    _socket!.on('reconnect_failed', (_) => log('💥 Reconnect failed'));
 
     log('✅ All event listeners set up');
   }

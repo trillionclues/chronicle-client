@@ -112,7 +112,6 @@ class GameRemoteDatasource {
     _connectionTimeoutTimer?.cancel();
 
     if (connected && !_isDisposed) {
-      log('🎮 Socket connected, joining game by code: $gameCode');
       _socketManager.joinGameByCode(gameCode);
       _safeAddToStream(_loadingController, false);
     } else if (!_isDisposed) {
@@ -177,7 +176,6 @@ class GameRemoteDatasource {
     // Joined events stream
     joinedStream.listen(
       (message) {
-        log('✅ Successfully joined game: $message');
         _safeAddToStream(_loadingController, false);
       },
       onError: (error) {
