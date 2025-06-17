@@ -16,4 +16,25 @@ class GameUtils {
         ? name.substring(0, 2).toUpperCase()
         : name.toUpperCase();
   }
+
+  static String normalizeGameCode(String code) {
+    return code.trim().replaceAll(RegExp(r'\s+'), '').toUpperCase();
+  }
+
+  static String? validateGameCode(String code) {
+    final normalized = normalizeGameCode(code);
+    if (normalized.isEmpty) return 'Game code cannot be empty';
+    if (normalized.length < 4) return 'Game code too short (min 4 characters)';
+    if (normalized.length > 10) return 'Game code too long (max 10 characters)';
+    if (!RegExp(r'^[A-Z0-9]+$').hasMatch(normalized)) {
+      return 'Only letters and numbers allowed';
+    }
+    return null;
+  }
+
+  static String formatGamePhaseTime(int seconds) {
+    int minutes = seconds ~/ 60;
+    int remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
 }

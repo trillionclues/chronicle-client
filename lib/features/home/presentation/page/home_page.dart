@@ -3,7 +3,9 @@ import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/circle_user_avatar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
+import 'package:chronicle/core/utils/chronicle_appbar.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
+import 'package:chronicle/core/utils/game_utils.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
@@ -43,34 +45,43 @@ class _HomePageState extends State<HomePage> {
   }
 
   AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: BlocBuilder<UserBloc, UserState>(builder: (context, state) {
-        return Row(
-          children: [
-            CircleUserAvatar(
-                width: ChronicleSizes.avatarMedium,
-                height: ChronicleSizes.avatarMedium,
-                url: state.userModel?.photoUrl ?? ""),
-            ChronicleSpacing.horizontalSM,
-            Text(
-              state.userModel?.name ?? "",
-              style: ChronicleTextStyles.bodyLarge(context).copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: ChronicleTextStyles.lg,
-              ),
-            )
-          ],
-        );
-      }),
+    return ChronicleAppBar.responsiveAppBar(
+      context: context,
+      titleWidget: BlocBuilder<UserBloc, UserState>(
+        builder: (context, state) {
+          return Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: ChronicleSpacing.screenPadding),
+            child: Row(
+              children: [
+                CircleUserAvatar(
+                  width: ChronicleSizes.responsiveAvatarSize(context),
+                  height: ChronicleSizes.responsiveAvatarSize(context),
+                  url: state.userModel?.photoUrl ?? "",
+                ),
+                ChronicleSpacing.horizontalSM,
+                Text(
+                  state.userModel?.name ?? "",
+                  style: ChronicleTextStyles.bodyLarge(context).copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
       actions: [
-        IconButton(
-            onPressed: () {
-              onLogoutPressed(context);
-            },
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.sm),
+          child: IconButton(
+            onPressed: () => onLogoutPressed(context),
             icon: Icon(
               Icons.logout,
-              size: ChronicleSizes.iconMedium,
-            )),
+              size: ChronicleSizes.responsiveIconSize(context),
+            ),
+          ),
+        )
       ],
     );
   }
@@ -128,16 +139,7 @@ class _HomePageState extends State<HomePage> {
               fieldType: "textField",
               controller: controller,
               onSubmitted: (text) {
-                if (text.isNotEmpty) {
-                  context
-                      .read<HomeBloc>()
-                      .add(CheckGameByCodeEvent(gameCode: text));
-                } else {
-                  ChronicleSnackBar.showError(
-                    context: context,
-                    message: "Game code cannot be empty",
-                  );
-                }
+                joinGameValidator(text);
               },
               borderRadius:
                   BorderRadius.circular(ChronicleSizes.smallBorderRadius),
@@ -213,5 +215,19 @@ class _HomePageState extends State<HomePage> {
             ],
           );
         });
+  }
+
+  void joinGameValidator(String rawCode) {
+    final gameCode = GameUtils.normalizeGameCode(rawCode);
+    final validationError = GameUtils.validateGameCode(rawCode);
+
+    if (validationError != null) {
+      ChronicleSnackBar.showError(
+        context: context,
+        message: validationError,
+      );
+      return;
+    }
+    context.read<HomeBloc>().add(CheckGameByCodeEvent(gameCode: gameCode));
   }
 }

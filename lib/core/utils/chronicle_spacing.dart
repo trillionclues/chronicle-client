@@ -203,6 +203,30 @@ class ChronicleSizes {
   );
 
   // RESPONSIVE METHODS
+  /// Responsive AppBar
+  static double responsiveAppBarHeight(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    if (screenHeight < 700) return appBarHeight * 0.858; // 44px
+    if (screenHeight < 900) return appBarHeight; // 56px
+    return 64.0; // 64px
+  }
+
+  static double responsiveIconSize(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth < 350) return iconMedium * 0.9;
+    if (screenWidth < 400) return iconMedium;
+    return iconLarge;
+  }
+
+  static EdgeInsets responsiveAppBarPadding(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return EdgeInsets.symmetric(
+      horizontal: screenWidth < 350
+          ? ChronicleSpacing.sm
+          : ChronicleSpacing.md,
+    );
+  }
+
   /// Get responsive button height based on screen size
   static double responsiveButtonHeight(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;

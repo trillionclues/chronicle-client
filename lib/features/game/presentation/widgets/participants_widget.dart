@@ -164,10 +164,11 @@ class ParticipantsWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              if ((gameState.gamePhase == GamePhase.canceled ||
-                      gameState.gamePhase == GamePhase.finished) &&
-                  !GameUtils.isCreator(
-                      state.userModel!, gameState.participants ?? []))
+              if (GameUtils.isCreator(
+                      state.userModel!, gameState.participants ?? []) &&
+                  !participant.isCreator &&
+                  (gameState.gamePhase == GamePhase.canceled ||
+                      gameState.gamePhase == GamePhase.finished))
                 IconButton(
                   onPressed: () {
                     context.read<GameBloc>().add(KickParticipantGameEvent(

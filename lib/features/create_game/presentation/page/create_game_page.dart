@@ -2,6 +2,7 @@ import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
+import 'package:chronicle/core/utils/chronicle_appbar.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_bloc.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_event.dart';
@@ -37,26 +38,10 @@ class _CreateGamePageState extends State<CreateGamePage> {
   }
 
   AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      title: Row(
-        children: [
-          IconButton(
-              onPressed: () {
-                context.pop();
-              },
-              icon: Icon(
-                Icons.chevron_left,
-                size: ChronicleSizes.iconLarge,
-              )),
-          Text(
-            "Create Game",
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-        ],
-      ),
-      titleSpacing: 0,
-      toolbarHeight: ChronicleSizes.appBarHeight,
+    return ChronicleAppBar.responsiveAppBar(
+      context: context,
+      title: "Create Game",
+      showBackButton: true,
     );
   }
 
