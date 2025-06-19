@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chronicle/core/failure/failure.dart';
 import 'package:chronicle/core/model/either.dart';
 import 'package:chronicle/features/game/data/datasource/game_remote_datasource.dart';
@@ -63,6 +65,29 @@ class GameRepositoryImpl implements GameRepository {
       return Either.right(gameRemoteDatasource.leaveGame(gameId));
     } catch (e) {
       return Either.left(GameFailure(message: "Leave game error!"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> submitFragment(String gameId, String text) async {
+    try {
+      if (text.length < 50) {
+        return Either.left(GameFailure(message: "Fragment too short"));
+      }
+      log("Submitting fragment: $text");
+      return Either.right(gameRemoteDatasource.submitFragment(gameId, text));
+    } catch (e) {
+      log("Error submitting fragment: $e");
+      return Either.left(GameFailure(message: "Submit text error!"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> submitVote(String gameId, String userId) async {
+    try {
+      return Either.right(gameRemoteDatasource.submitVote(gameId, userId));
+    } catch (e) {
+      return Either.left(GameFailure(message: "Submit vote error!"));
     }
   }
 }

@@ -52,6 +52,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
             onTap: () => FocusScope.of(context).unfocus(),
             child: SafeArea(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -157,7 +158,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: DefaultButton(
-                          text: "Create",
+                          text: "Create Game",
                           loading: state.status == CreateGameStatus.loading,
                           onPressed: title.isEmpty
                               ? () {

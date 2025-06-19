@@ -395,7 +395,7 @@ class SocketManager {
         ?.emit('kickParticipant', {'gameId': gameId, 'participantId': userId});
   }
 
-  void submitText(String gameId, String text) {
+  void submitFragment(String gameId, String text) {
     if (!isConnected || _isDisposed) return;
     log('📝 Submitting text for game: $gameId');
     _socket?.emit('submitText', {'gameId': gameId, 'text': text});

@@ -2,7 +2,6 @@ import 'package:chronicle/core/socket_manager.dart';
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
-import 'package:chronicle/core/utils/chronicle_appbar.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/core/utils/game_utils.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
@@ -10,6 +9,7 @@ import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_event.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
+import 'package:chronicle/features/game/presentation/widgets/game_phase_appbar.dart';
 import 'package:chronicle/features/game/presentation/widgets/gamecode_card_widget.dart';
 import 'package:chronicle/features/game/presentation/widgets/participants_widget.dart';
 import 'package:flutter/material.dart';
@@ -21,56 +21,10 @@ class GameWaitingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: GamePhaseAppbar(
+        title: "Waiting for players...",showBackButton: true,actionText: "Cancel Game",
+      ).build(context),
       body: _buildBody(context),
-    );
-  }
-
-  AppBar _buildAppBar(BuildContext context) {
-    return ChronicleAppBar.responsiveAppBar(
-      context: context,
-      titleWidget: BlocBuilder<GameBloc, GameState>(
-        builder: (context, state) {
-          return BlocBuilder<UserBloc, UserState>(
-            builder: (context, userState) {
-              final isCreator = userState.userModel != null &&
-                  state.participants != null &&
-                  state.participants!.isNotEmpty &&
-                  GameUtils.isCreator(
-                      userState.userModel!, state.participants!);
-
-              return Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      "Waiting for players...",
-                      style: ChronicleTextStyles.bodyLarge(context),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (isCreator)
-                    TextButton(
-                      onPressed: () =>
-                          context.read<GameBloc>().add(CancelGameEvent()),
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: ChronicleSpacing.md,
-                        ),
-                        textStyle:
-                            ChronicleTextStyles.bodyMedium(context).copyWith(
-                          color: AppColors.errorColor,
-                        ),
-                        foregroundColor: AppColors.errorColor,
-                      ),
-                      child: const Text("Cancel Game"),
-                    ),
-                ],
-              );
-            },
-          );
-        },
-      ),
-      showBackButton: true,
     );
   }
 
@@ -181,7 +135,7 @@ class GameWaitingPage extends StatelessWidget {
           state.participants.isNotEmpty &&
           GameUtils.isCreator(userState.userModel!, state.participants);
 
-      final canStartGame = state.participants.length >= 2;
+      final canStartGame = state.participants.length >= 1;
 
       if (!isCreator) return const SizedBox.shrink();
 

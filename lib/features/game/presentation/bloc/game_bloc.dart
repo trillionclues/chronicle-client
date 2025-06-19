@@ -22,6 +22,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<GameErrorEvent>(_onGameErrorEvent);
     on<KickParticipantGameEvent>(_onKickParticipantEvent);
     on<LeaveGameEvent>(_onGameLeaveEvent);
+    on<SubmitFragmentEvent>(_onSubmitFragmentEvent);
+    on<SubmitVoteEvent>(_onSubmitVoteEvent);
     on<DisposeGameEvent>(_onDisposeGameEvent);
   }
 
@@ -144,6 +146,38 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
     emit(state.copyWith(
         status: GameStatus.leftGame, errorMessage: 'You have left the game.'));
+  }
+
+  void _onSubmitFragmentEvent(
+      SubmitFragmentEvent event, Emitter<GameState> emit) {
+    if (_disposed) return;
+
+    emit(state.copyWith(status: GameStatus.loading));
+
+    try {
+      if (state.gameId != null) {
+        log('Submitting fragment bloc: ${event.text}');
+        gameRepository.submitFragment(state.gameId!, event.text);
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        status: GameStatus.error,
+        errorMessage: "Failed to submit fragment: $e",
+      ));
+    }
+  }
+
+  void _onSubmitVoteEvent(SubmitVoteEvent event, Emitter<GameState> emit) {
+    if (_disposed) return;
+
+    if (state.gameId != null) {
+      gameRepository.submitFragment(state.gameId!, event.userId);
+    }
+
+    emit(state.copyWith(
+      status: GameStatus.success,
+      errorMessage: "Text submitted successfully!",
+    ));
   }
 
   void _onDisposeGameEvent(DisposeGameEvent event, Emitter<GameState> emit) {

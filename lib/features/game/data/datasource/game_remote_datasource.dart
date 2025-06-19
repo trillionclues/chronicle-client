@@ -391,9 +391,9 @@ class GameRemoteDatasource {
     }
   }
 
-  Future<void> submitText(String gameId, String text) async {
+  Future<void> submitFragment(String gameId, String text) async {
     if (!_isDisposed) {
-      _socketManager.submitText(gameId, text);
+      _socketManager.submitFragment(gameId, text);
     }
   }
 

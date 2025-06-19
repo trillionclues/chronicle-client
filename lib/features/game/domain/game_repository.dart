@@ -34,5 +34,10 @@ abstract class GameRepository {
   Future<Either<Failure, void>> cancelGame(String gameId);
 
   Future<Either<Failure, void>> kickParticipant(String gameId, String userId);
+
   Future<Either<Failure, void>> leaveGame(String gameId);
+
+  Future<Either<Failure, void>> submitFragment(String gameId, String text);
+
+  Future<Either<Failure, void>> submitVote(String gameId, String userId);
 }
