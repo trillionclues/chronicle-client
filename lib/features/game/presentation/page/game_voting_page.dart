@@ -22,9 +22,9 @@ class _GameVotingPageState extends State<GameVotingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: GamePhaseAppbar(
-      //   showBackButton: false,
-      // ).build(context),
+      appBar: const GamePhaseAppbar(
+        showBackButton: false,
+      ),
       body: _buildBody(context),
     );
   }
@@ -43,46 +43,45 @@ class _GameVotingPageState extends State<GameVotingPage> {
               ),
             )
           : Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
+            child: Column(
               children: [
-                Container(
-                    padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-                    child: Column(
-                      children: [
-                        TimerWidget(),
-                        ChronicleSpacing.verticalMD,
-                        _buildPhaseInfo(state),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            padding: EdgeInsets.all(
-                              ChronicleSpacing.screenPadding,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Vote for your favorite fragment to continue the story.",
-                                  style:
-                                      ChronicleTextStyles.bodyMedium(context),
-                                ),
-                                ChronicleSpacing.verticalSM,
-                                Text(
-                                  "You cannot vote for your own submission.",
-                                  style: ChronicleTextStyles.bodySmall(context)
-                                      .copyWith(
-                                    color:
-                                        AppColors.errorColor.withOpacity(0.8),
-                                  ),
-                                ),
-                                ChronicleSpacing.verticalXL,
-                                ..._buildFragmentOptions(context, state),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    )),
+                const TimerWidget(),
+                ChronicleSpacing.verticalMD,
+                _buildPhaseInfo(state),
               ],
-            );
+            ),
+          ),
+
+          // Scrollable content
+          Flexible(
+            fit: FlexFit.loose,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Vote for your favorite fragment...",
+                    style: ChronicleTextStyles.bodyMedium(context),
+                  ),
+                  ChronicleSpacing.verticalSM,
+                  Text(
+                    "You cannot vote for your own submission.",
+                    style: ChronicleTextStyles.bodySmall(context).copyWith(
+                      color: AppColors.errorColor.withOpacity(0.8),
+                    ),
+                  ),
+                  ChronicleSpacing.verticalXL,
+                  ..._buildFragmentOptions(context, state),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
     });
   }
 
@@ -96,7 +95,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
               "Current Phase",
               style: ChronicleTextStyles.bodyMedium(context),
             ),
-            Text("Writing Fragment",
+            Text("Voting Phase",
                 style: ChronicleTextStyles.bodyMedium(context).copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,

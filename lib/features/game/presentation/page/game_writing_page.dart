@@ -41,65 +41,69 @@ class _GameWritingPageState extends State<GameWritingPage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return BlocListener<GameBloc, GameState>(listener: (context, state) {
-      if (state.status == GameStatus.error && state.errorMessage != null) {
-        ChronicleSnackBar.showError(
-          context: context,
-          message: state.errorMessage ?? "An error occurred",
-        );
-      }
-      if (state.participants.any((p) => p.hasSubmitted == true)) {
-        _controller.clear();
-        setState(() => _charCount = 0);
-        ChronicleSnackBar.showSuccess(
-          context: context,
-          message: "Fragment submitted successfully!",
-        );
-      }
-    }, child: BlocBuilder<GameBloc, GameState>(builder: (context, state) {
-      final socketManager = SocketManager();
-      final bool isLoading =
-          state.status == GameStatus.loading || !socketManager.isConnected;
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: BlocListener<GameBloc, GameState>(
+        listener: (context, state) {
+          if (state.status == GameStatus.error && state.errorMessage != null) {
+            ChronicleSnackBar.showError(
+              context: context,
+              message: state.errorMessage ?? "An error occurred",
+            );
+          }
+          if (state.participants.any((p) => p.hasSubmitted == true)) {
+            _controller.clear();
+            setState(() => _charCount = 0);
+            ChronicleSnackBar.showSuccess(
+              context: context,
+              message: "Fragment submitted successfully!",
+            );
+          }
+        },
+        child: BlocBuilder<GameBloc, GameState>(
+          builder: (context, state) {
+            final socketManager = SocketManager();
+            final bool isLoading =
+                state.status == GameStatus.loading || !socketManager.isConnected;
 
-      return isLoading
-          ? const Center(
+            return isLoading
+                ? const Center(
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 color: AppColors.primary,
               ),
             )
-          : Column(
+                : Column(
               children: [
                 Container(
-                    padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-                    child: Column(
-                      children: [
-                        TimerWidget(),
-                        ChronicleSpacing.verticalMD,
-                        _buildPhaseInfo(state),
-                      ],
-                    )),
+                  padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
+                  child: Column(
+                    children: [
+                      const TimerWidget(),
+                      ChronicleSpacing.verticalMD,
+                      _buildPhaseInfo(state),
+                    ],
+                  ),
+                ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(
-                      ChronicleSpacing.screenPadding,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildStorySection(context, state),
-                        ChronicleSpacing.verticalXL,
-                        _buildWritingSection(context, state),
-                        ChronicleSpacing.verticalXL,
-                        const ParticipantsWidget(),
-                      ],
-                    ),
+                  child: ListView(
+                    padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
+                    children: [
+                      _buildStorySection(context, state),
+                      ChronicleSpacing.verticalXL,
+                      _buildWritingSection(context, state),
+                      ChronicleSpacing.verticalXL,
+                      const ParticipantsWidget(),
+                    ],
                   ),
                 ),
                 _buildSubmitButton(context, state),
               ],
             );
-    }));
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildPhaseInfo(GameState state) {
@@ -172,7 +176,7 @@ class _GameWritingPageState extends State<GameWritingPage> {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius:
-                BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+            BorderRadius.circular(ChronicleSizes.smallBorderRadius),
             border: Border.all(color: AppColors.diverColor.withOpacity(0.2)),
           ),
           child: Text(
@@ -203,7 +207,7 @@ class _GameWritingPageState extends State<GameWritingPage> {
           minLines: 4,
           maxLength: 255,
           hintText:
-              "${state.history.isNotEmpty ? "Start the story!" : "Continue the story"} Be the first to add a twist...",
+          "${state.history.isNotEmpty ? "Start the story!" : "Continue the story"} Be the first to add a twist...",
           borderRadius: BorderRadius.circular(ChronicleSizes.smallBorderRadius),
           onChanged: (value) {
             setState(() => _charCount = value.length);
@@ -224,13 +228,8 @@ class _GameWritingPageState extends State<GameWritingPage> {
     }
 
     context.read<GameBloc>().add(
-          SubmitFragmentEvent(text: _controller.text.trim()),
-        );
-    // ChronicleSnackBar.showSuccess(
-    //   context: context,
-    //   message: "Fragment submitted successfully!",
-    // );
-    // _controller.clear();
+      SubmitFragmentEvent(text: _controller.text.trim()),
+    );
     setState(() => _charCount = 0);
   }
 }

@@ -152,8 +152,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       SubmitFragmentEvent event, Emitter<GameState> emit) async {
     if (_disposed) return;
 
-    emit(state.copyWith(status: GameStatus.loading));
-
     try {
       if (state.gameId != null) {
         await gameRepository.submitFragment(state.gameId!, event.text);
