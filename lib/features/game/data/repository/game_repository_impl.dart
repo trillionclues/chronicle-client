@@ -71,10 +71,6 @@ class GameRepositoryImpl implements GameRepository {
   @override
   Future<Either<Failure, void>> submitFragment(String gameId, String text) async {
     try {
-      if (text.length < 50) {
-        return Either.left(GameFailure(message: "Fragment too short"));
-      }
-      log("Submitting fragment: $text");
       return Either.right(gameRemoteDatasource.submitFragment(gameId, text));
     } catch (e) {
       log("Error submitting fragment: $e");

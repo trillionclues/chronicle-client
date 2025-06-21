@@ -33,15 +33,30 @@ class _GameWritingPageState extends State<GameWritingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GamePhaseAppbar(
+      appBar: const GamePhaseAppbar(
         showBackButton: false,
-      ).build(context),
+      ),
       body: _buildBody(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
-    return BlocBuilder<GameBloc, GameState>(builder: (context, state) {
+    return BlocListener<GameBloc, GameState>(listener: (context, state) {
+      if (state.status == GameStatus.error && state.errorMessage != null) {
+        ChronicleSnackBar.showError(
+          context: context,
+          message: state.errorMessage ?? "An error occurred",
+        );
+      }
+      if (state.participants.any((p) => p.hasSubmitted == true)) {
+        _controller.clear();
+        setState(() => _charCount = 0);
+        ChronicleSnackBar.showSuccess(
+          context: context,
+          message: "Fragment submitted successfully!",
+        );
+      }
+    }, child: BlocBuilder<GameBloc, GameState>(builder: (context, state) {
       final socketManager = SocketManager();
       final bool isLoading =
           state.status == GameStatus.loading || !socketManager.isConnected;
@@ -84,7 +99,7 @@ class _GameWritingPageState extends State<GameWritingPage> {
                 _buildSubmitButton(context, state),
               ],
             );
-    });
+    }));
   }
 
   Widget _buildPhaseInfo(GameState state) {
@@ -209,13 +224,13 @@ class _GameWritingPageState extends State<GameWritingPage> {
     }
 
     context.read<GameBloc>().add(
-      SubmitFragmentEvent(text: _controller.text.trim()),
-    );
-    ChronicleSnackBar.showSuccess(
-      context: context,
-      message: "Fragment submitted successfully!",
-    );
-    _controller.clear();
+          SubmitFragmentEvent(text: _controller.text.trim()),
+        );
+    // ChronicleSnackBar.showSuccess(
+    //   context: context,
+    //   message: "Fragment submitted successfully!",
+    // );
+    // _controller.clear();
     setState(() => _charCount = 0);
   }
 }

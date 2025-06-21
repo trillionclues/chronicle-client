@@ -21,144 +21,154 @@ class GameWaitingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GamePhaseAppbar(
-        title: "Waiting for players...",showBackButton: true,actionText: "Cancel Game",
-      ).build(context),
+      appBar: const GamePhaseAppbar(
+        title: "Waiting for players...",
+        showBackButton: true,
+        actionText: "Cancel Game",
+      ),
       body: _buildBody(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
-    return BlocBuilder<GameBloc, GameState>(builder: (context, state) {
-      final socketManager = SocketManager();
-      final bool isLoading =
-          state.status == GameStatus.loading || !socketManager.isConnected;
+    return BlocBuilder<GameBloc, GameState>(
+      builder: (context, state) {
+        final socketManager = SocketManager();
+        final bool isLoading =
+            state.status == GameStatus.loading || !socketManager.isConnected;
 
-      return isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.primary,
-              ),
-            )
-          : Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-                  child: GameCodeCardWidget(state: state),
+        return isLoading
+            ? const Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: AppColors.primary,
+          ),
+        )
+            : Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
+              child: GameCodeCardWidget(state: state),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: ChronicleSpacing.screenPadding,
                 ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: ChronicleSpacing.screenPadding,
-                    ),
-                    child: Column(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ChronicleSpacing.verticalLG,
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ChronicleSpacing.verticalLG,
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${state.title}",
-                              style: ChronicleTextStyles.bodyLarge(context)
-                                  .copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            ChronicleSpacing.verticalXS,
-                            RichText(
-                              text: TextSpan(
-                                style: ChronicleTextStyles.bodySmall(context),
-                                children: [
-                                  const TextSpan(text: "Round Duration: "),
-                                  TextSpan(
-                                    text:
-                                        "${state.roundDuration ~/ 60} minutes",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            ChronicleSpacing.verticalXS,
-                            RichText(
-                              text: TextSpan(
-                                style: ChronicleTextStyles.bodySmall(context),
-                                children: [
-                                  const TextSpan(text: "Voting Duration: "),
-                                  TextSpan(
-                                    text:
-                                        "${state.votingDuration ~/ 60} minutes",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            ChronicleSpacing.verticalXS,
-                            RichText(
-                              text: TextSpan(
-                                style: ChronicleTextStyles.bodySmall(context),
-                                children: [
-                                  const TextSpan(text: "Rounds: "),
-                                  TextSpan(
-                                    text: "${state.rounds}",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        Text(
+                          "${state.title}",
+                          style: ChronicleTextStyles.bodyLarge(context)
+                              .copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primary,
+                          ),
                         ),
-                        ChronicleSpacing.verticalLG,
-                        const ParticipantsWidget(),
-                        ChronicleSpacing.verticalXL,
+                        ChronicleSpacing.verticalXS,
+                        RichText(
+                          text: TextSpan(
+                            style: ChronicleTextStyles.bodySmall(context),
+                            children: [
+                              const TextSpan(text: "Round Duration: "),
+                              TextSpan(
+                                text:
+                                "${state.roundDuration ~/ 60} minutes",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ChronicleSpacing.verticalXS,
+                        RichText(
+                          text: TextSpan(
+                            style: ChronicleTextStyles.bodySmall(context),
+                            children: [
+                              const TextSpan(text: "Voting Duration: "),
+                              TextSpan(
+                                text:
+                                "${state.votingDuration ~/ 60} minutes",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ChronicleSpacing.verticalXS,
+                        RichText(
+                          text: TextSpan(
+                            style: ChronicleTextStyles.bodySmall(context),
+                            children: [
+                              const TextSpan(text: "Rounds: "),
+                              TextSpan(
+                                text: "${state.rounds}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                    ChronicleSpacing.verticalLG,
+                    const ParticipantsWidget(),
+                    ChronicleSpacing.verticalXL,
+                  ],
                 ),
-                Container(
-                  padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-                  child: _buildStartGameButton(context, state),
-                ),
-              ],
-            );
-    });
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
+              child: _buildStartGameButton(context, state),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  Widget _buildStartGameButton(BuildContext context, GameState state) {
-    return BlocBuilder<UserBloc, UserState>(builder: (context, userState) {
-      final isCreator = userState.userModel != null &&
-          state.participants.isNotEmpty &&
-          GameUtils.isCreator(userState.userModel!, state.participants);
+  Widget _buildStartGameButton(BuildContext context, GameState gameState) {
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, userState) {
+        // Safety check to prevent crashes
+        if (userState.userModel == null || gameState.participants.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-      final canStartGame = state.participants.length >= 1;
+        final isCreator = GameUtils.isCreator(
+          userState.userModel!,
+          gameState.participants,
+        );
 
-      if (!isCreator) return const SizedBox.shrink();
+        if (!isCreator) return const SizedBox.shrink();
 
-      return SizedBox(
-        width: double.infinity,
-        height: ChronicleSizes.buttonHeight,
-        child: DefaultButton(
-          onPressed: canStartGame
-              ? () {
-                  context.read<GameBloc>().add(StartGameEvent());
-                }
-              : () {
-                  ChronicleSnackBar.showError(
-                    context: context,
-                    message: "At least 2 players required to start game.",
-                  );
-                },
-          loading: state.status == GameStatus.loading,
-          backgroundColor: AppColors.primary,
-          text: "Start Game",
-          textColor: AppColors.surface,
-        ),
-      );
-    });
+        final canStartGame = gameState.participants.length >= 1;
+
+        return SizedBox(
+          width: double.infinity,
+          height: ChronicleSizes.buttonHeight,
+          child: DefaultButton(
+            onPressed: canStartGame
+                ? () => context.read<GameBloc>().add(StartGameEvent())
+                : () {
+              ChronicleSnackBar.showError(
+                context: context,
+                message: "At least 2 players required to start game.",
+              );
+            },
+            loading: gameState.status == GameStatus.loading,
+            backgroundColor: AppColors.primary,
+            text: "Start Game",
+            textColor: AppColors.surface,
+          ),
+        );
+      },
+    );
   }
 }

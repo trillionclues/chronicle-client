@@ -22,9 +22,9 @@ class _GameVotingPageState extends State<GameVotingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GamePhaseAppbar(
-        showBackButton: false,
-      ).build(context),
+      // appBar: GamePhaseAppbar(
+      //   showBackButton: false,
+      // ).build(context),
       body: _buildBody(context),
     );
   }

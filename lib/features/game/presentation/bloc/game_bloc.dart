@@ -148,16 +148,15 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         status: GameStatus.leftGame, errorMessage: 'You have left the game.'));
   }
 
-  void _onSubmitFragmentEvent(
-      SubmitFragmentEvent event, Emitter<GameState> emit) {
+  Future<void> _onSubmitFragmentEvent(
+      SubmitFragmentEvent event, Emitter<GameState> emit) async {
     if (_disposed) return;
 
     emit(state.copyWith(status: GameStatus.loading));
 
     try {
       if (state.gameId != null) {
-        log('Submitting fragment bloc: ${event.text}');
-        gameRepository.submitFragment(state.gameId!, event.text);
+        await gameRepository.submitFragment(state.gameId!, event.text);
       }
     } catch (e) {
       emit(state.copyWith(
@@ -171,7 +170,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     if (_disposed) return;
 
     if (state.gameId != null) {
-      gameRepository.submitFragment(state.gameId!, event.userId);
+      gameRepository.submitVote(state.gameId!, event.userId);
     }
 
     emit(state.copyWith(

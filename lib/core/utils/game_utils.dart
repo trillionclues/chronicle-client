@@ -3,8 +3,8 @@ import 'package:chronicle/features/game/domain/model/participant_model.dart';
 
 class GameUtils {
   static bool isCreator(UserModel user, List<ParticipantModel> participants) {
-    return user.id ==
-        participants.firstWhere((participant) => participant.isCreator).id;
+    final participant = participants.where((p) => p.id == user.id).firstOrNull;
+    return participant?.isCreator ?? false;
   }
 
   static String getInitials(String name) {
