@@ -55,12 +55,12 @@ Chronicle is a collaborative storytelling mobile app that allows users to create
 
 - **Android**:
     ```sh
-    flutter run
+    flutter run -d emulator-<device_id>
     ```
 
 - **iOS**:
     ```sh
-    flutter run
+    flutter run -d ios
     ```
 
 ## Project Structure
@@ -84,7 +84,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Flutter](https://flutter.dev/)
 - [Firebase](https://firebase.google.com/)
-- [Dio](https://pub.dev/packages/dio)
 
 ## Contact
 

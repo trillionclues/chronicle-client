@@ -4,10 +4,13 @@ import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
+import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
+import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_event.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
 import 'package:chronicle/features/game/presentation/widgets/game_phase_appbar.dart';
+import 'package:chronicle/features/game/presentation/widgets/history_widget.dart';
 import 'package:chronicle/features/game/presentation/widgets/participants_widget.dart';
 import 'package:chronicle/features/game/presentation/widgets/timer_widget.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +26,36 @@ class GameWritingPage extends StatefulWidget {
 class _GameWritingPageState extends State<GameWritingPage> {
   final TextEditingController _controller = TextEditingController();
   int _charCount = 0;
+  bool _hasSubmitted = false;
+  String? _userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _userId = context.read<UserBloc>().state.userModel?.id;
+    _checkInitialSubmissionStatus();
+  }
+
+  void _checkInitialSubmissionStatus() {
+    final gameState = context.read<GameBloc>().state;
+
+    if (_userId != null) {
+      // final hasSubmitted = gameState.participants
+      //     .any((p) => p.id == userId && p.hasSubmitted == true);
+      final participant = gameState.participants.firstWhere(
+        (p) => p.id == _userId,
+        orElse: () => throw Exception("User not found in participants"),
+      );
+
+      setState(() {
+        _hasSubmitted = participant.hasSubmitted ?? false;
+        if (_hasSubmitted) {
+          _controller.clear();
+          _charCount = 0;
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -37,72 +70,148 @@ class _GameWritingPageState extends State<GameWritingPage> {
         showBackButton: false,
       ),
       body: _buildBody(context),
+      floatingActionButton: _buildManualNextPhaseButton(context),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: BlocListener<GameBloc, GameState>(
-        listener: (context, state) {
-          if (state.status == GameStatus.error && state.errorMessage != null) {
-            ChronicleSnackBar.showError(
-              context: context,
-              message: state.errorMessage ?? "An error occurred",
-            );
-          }
-          if (state.participants.any((p) => p.hasSubmitted == true)) {
-            _controller.clear();
-            setState(() => _charCount = 0);
-            ChronicleSnackBar.showSuccess(
-              context: context,
-              message: "Fragment submitted successfully!",
-            );
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<GameBloc, GameState>(
+            listener: (context, state) {
+              if (state.status == GameStatus.error &&
+                  state.errorMessage != null) {
+                ChronicleSnackBar.showError(
+                  context: context,
+                  message: state.errorMessage!,
+                );
+              }
+
+              if (_userId != null) {
+                final participant = state.participants.firstWhere(
+                  (p) => p.id == _userId,
+                  orElse: () =>
+                      throw Exception("User not found in participants"),
+                );
+
+                if (participant?.hasSubmitted != _hasSubmitted) {
+                  setState(() {
+                    _hasSubmitted = participant?.hasSubmitted ?? false;
+                    if (_hasSubmitted) {
+                      _controller.clear();
+                      _charCount = 0;
+                    }
+                  });
+                }
+              }
+            },
+          ),
+          BlocListener<UserBloc, UserState>(
+            listener: (context, state) {
+              if (state.userModel?.id != _userId) {
+                setState(() {
+                  _userId = state.userModel?.id;
+                });
+              }
+            },
+          ),
+        ],
         child: BlocBuilder<GameBloc, GameState>(
           builder: (context, state) {
             final socketManager = SocketManager();
-            final bool isLoading =
-                state.status == GameStatus.loading || !socketManager.isConnected;
+            final bool isLoading = state.status == GameStatus.loading ||
+                !socketManager.isConnected;
 
             return isLoading
                 ? const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: AppColors.primary,
-              ),
-            )
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  )
                 : Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-                  child: Column(
                     children: [
-                      const TimerWidget(),
-                      ChronicleSpacing.verticalMD,
-                      _buildPhaseInfo(state),
+                      Container(
+                        padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
+                        child: Column(
+                          children: [
+                            const TimerWidget(),
+                            ChronicleSpacing.verticalMD,
+                            _buildPhaseInfo(state),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView(
+                          padding:
+                              EdgeInsets.all(ChronicleSpacing.screenPadding),
+                          children: [
+                            _buildStorySection(context, state),
+                            ChronicleSpacing.verticalXL,
+                            if (!_hasSubmitted)
+                              _buildWritingSection(context, state),
+                            ChronicleSpacing.verticalXL,
+                            const ParticipantsWidget(),
+                          ],
+                        ),
+                      ),
+                      if (!_hasSubmitted) _buildSubmitButton(context, state),
                     ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-                    children: [
-                      _buildStorySection(context, state),
-                      ChronicleSpacing.verticalXL,
-                      _buildWritingSection(context, state),
-                      ChronicleSpacing.verticalXL,
-                      const ParticipantsWidget(),
-                    ],
-                  ),
-                ),
-                _buildSubmitButton(context, state),
-              ],
-            );
+                  );
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildManualNextPhaseButton(BuildContext context) {
+    return BlocSelector<GameBloc, GameState, bool>(
+      selector: (state) {
+        if (_userId == null) return false;
+        return state.participants.any(
+          (p) => p.id == _userId && p.isCreator == true,
+        );
+      },
+      builder: (context, isCreator) {
+        if (!isCreator) return SizedBox.shrink();
+
+        return BlocSelector<GameBloc, GameState, GameStatus>(
+          selector: (state) => state.status,
+          builder: (context, status) {
+            if (status == GameStatus.loading) {
+              return SizedBox.shrink();
+            }
+
+            return FloatingActionButton(
+              onPressed: () {
+                // context.read<GameBloc>().add(ManualNextPhaseEvent());
+              },
+              backgroundColor: AppColors.secondary,
+              tooltip: 'Advance to next phase',
+              child: const Icon(Icons.done, color: AppColors.surface),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildStorySection(BuildContext context, GameState state) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Story so far:",
+            style: ChronicleTextStyles.bodyLarge(context)
+                .copyWith(fontWeight: FontWeight.bold)),
+        ChronicleSpacing.verticalMD,
+        if (state.history.isEmpty)
+          Text("No story yet - be the first to contribute!",
+              style: ChronicleTextStyles.bodyMedium(context))
+        else
+          const HistoryWidget(),
+      ],
     );
   }
 
@@ -150,43 +259,20 @@ class _GameWritingPageState extends State<GameWritingPage> {
         width: double.infinity,
         height: ChronicleSizes.buttonHeight,
         child: DefaultButton(
-          onPressed: _charCount >= 50 ? () => _submitFragment(context) : null,
+          onPressed: _charCount >= 50
+              ? () => _submitFragment(context)
+              : () {
+                  ChronicleSnackBar.showError(
+                    context: context,
+                    message: "Fragment must be at least 50 characters",
+                  );
+                },
           loading: state.status == GameStatus.loading,
           backgroundColor: AppColors.primary,
           text: "Submit Fragment",
           textColor: AppColors.surface,
         ),
       ),
-    );
-  }
-
-  Widget _buildStorySection(BuildContext context, GameState state) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Story so far:",
-          style: ChronicleTextStyles.bodyLarge(context).copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        ChronicleSpacing.verticalMD,
-        Container(
-          padding: EdgeInsets.all(ChronicleSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius:
-            BorderRadius.circular(ChronicleSizes.smallBorderRadius),
-            border: Border.all(color: AppColors.diverColor.withOpacity(0.2)),
-          ),
-          child: Text(
-            state.history.isNotEmpty
-                ? "Current Story"
-                : "No story yet - be the first to contribute!",
-            style: ChronicleTextStyles.bodyMedium(context),
-          ),
-        )
-      ],
     );
   }
 
@@ -207,11 +293,10 @@ class _GameWritingPageState extends State<GameWritingPage> {
           minLines: 4,
           maxLength: 255,
           hintText:
-          "${state.history.isNotEmpty ? "Start the story!" : "Continue the story"} Be the first to add a twist...",
+              "${state.history.isNotEmpty ? "Start the story!" : "Continue the story"} Be the first to add a twist...",
           borderRadius: BorderRadius.circular(ChronicleSizes.smallBorderRadius),
           onChanged: (value) {
             setState(() => _charCount = value.length);
-            // context.read<GameBloc>().add(UpdateFragmentEvent(fragment: value));
           },
         ),
       ],
@@ -226,10 +311,13 @@ class _GameWritingPageState extends State<GameWritingPage> {
       );
       return;
     }
-
     context.read<GameBloc>().add(
-      SubmitFragmentEvent(text: _controller.text.trim()),
-    );
+          SubmitFragmentEvent(text: _controller.text.trim()),
+        );
     setState(() => _charCount = 0);
+    ChronicleSnackBar.showSuccess(
+      context: context,
+      message: "Fragment submitted successfully!",
+    );
   }
 }

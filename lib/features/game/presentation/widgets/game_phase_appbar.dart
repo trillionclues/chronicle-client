@@ -100,7 +100,7 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   List<Widget>? _buildActions(BuildContext context) {
-    // Only show exit action when there's no title (during game phases)
+    // Only show exit action when there's no title (during game phases != waiting)
     if (title == null) {
       return [
         IconButton(

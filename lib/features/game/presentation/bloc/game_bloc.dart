@@ -164,17 +164,20 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
-  void _onSubmitVoteEvent(SubmitVoteEvent event, Emitter<GameState> emit) {
+  Future<void> _onSubmitVoteEvent(
+      SubmitVoteEvent event, Emitter<GameState> emit) async {
     if (_disposed) return;
 
-    if (state.gameId != null) {
-      gameRepository.submitVote(state.gameId!, event.userId);
+    try {
+      if (state.gameId != null) {
+        await gameRepository.submitVote(state.gameId!, event.userId);
+      }
+    } catch (e) {
+      emit(state.copyWith(
+        status: GameStatus.error,
+        errorMessage: "Failed to submit vote: $e",
+      ));
     }
-
-    emit(state.copyWith(
-      status: GameStatus.success,
-      errorMessage: "Text submitted successfully!",
-    ));
   }
 
   void _onDisposeGameEvent(DisposeGameEvent event, Emitter<GameState> emit) {

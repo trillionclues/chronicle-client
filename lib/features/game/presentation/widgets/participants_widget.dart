@@ -164,6 +164,8 @@ class ParticipantsWidget extends StatelessWidget {
                   ],
                 ),
               ),
+              _buildStatusIndicator(context, participant),
+              ChronicleSpacing.horizontalSM,
               if (GameUtils.isCreator(
                       state.userModel!, gameState.participants ?? []) &&
                   !participant.isCreator &&
@@ -267,5 +269,20 @@ class ParticipantsWidget extends StatelessWidget {
             ],
           ),
         ));
+  }
+
+  Widget _buildStatusIndicator(
+      BuildContext context, ParticipantModel participant) {
+    return BlocBuilder<GameBloc, GameState>(builder: (context, state) {
+      if ([
+        GamePhase.writing,
+        GamePhase.voting,
+        GamePhase.finished,
+        GamePhase.canceled
+      ].contains(state.gamePhase)) {
+        return Container();
+      }
+      return Icon(participant.hasSubmitted ? Icons.done : Icons.timer_outlined);
+    });
   }
 }

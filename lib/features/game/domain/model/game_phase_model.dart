@@ -4,4 +4,5 @@ enum GamePhase {
   voting,
   finished,
   canceled,
+  votingResults
 }

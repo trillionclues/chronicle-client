@@ -10,6 +10,7 @@ class ParticipantModel{
   final String? text;
   final bool isCreator;
   final bool hasSubmitted;
+ final bool writingComplete;
 
   const ParticipantModel({
     required this.id,
@@ -18,6 +19,7 @@ class ParticipantModel{
     this.text,
     this.isCreator = false,
     this.hasSubmitted = false,
+    required this.writingComplete,
   });
 
 

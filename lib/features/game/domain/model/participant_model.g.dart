@@ -14,6 +14,7 @@ ParticipantModel _$ParticipantModelFromJson(Map<String, dynamic> json) =>
       text: json['text'] as String?,
       isCreator: json['isCreator'] as bool? ?? false,
       hasSubmitted: json['hasSubmitted'] as bool? ?? false,
+      writingComplete: json['writingComplete'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ParticipantModelToJson(ParticipantModel instance) =>
@@ -24,4 +25,5 @@ Map<String, dynamic> _$ParticipantModelToJson(ParticipantModel instance) =>
       'text': instance.text,
       'isCreator': instance.isCreator,
       'hasSubmitted': instance.hasSubmitted,
+      'writingComplete': instance.writingComplete,
     };

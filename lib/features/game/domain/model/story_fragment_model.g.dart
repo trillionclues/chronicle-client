@@ -11,6 +11,8 @@ StoryFragmentModel _$StoryFragmentModelFromJson(Map<String, dynamic> json) =>
       text: json['text'] as String,
       author: ParticipantModel.fromJson(json['author'] as Map<String, dynamic>),
       votes: (json['votes'] as num).toInt(),
+      round: (json['round'] as num).toInt(),
+      isWinner: json['isWinner'] as bool,
     );
 
 Map<String, dynamic> _$StoryFragmentModelToJson(StoryFragmentModel instance) =>
@@ -18,4 +20,6 @@ Map<String, dynamic> _$StoryFragmentModelToJson(StoryFragmentModel instance) =>
       'text': instance.text,
       'author': instance.author,
       'votes': instance.votes,
+      'round': instance.round,
+      'isWinner': instance.isWinner,
     };

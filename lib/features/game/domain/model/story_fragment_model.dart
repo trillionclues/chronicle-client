@@ -8,11 +8,15 @@ class StoryFragmentModel {
   final String text;
   final ParticipantModel author;
   final int votes;
+  final int round;
+  final bool isWinner;
 
   const StoryFragmentModel({
     required this.text,
     required this.author,
     required this.votes,
+    required this.round,
+    required this.isWinner,
   });
 
   factory StoryFragmentModel.fromJson(Map<String, dynamic> json) =>

@@ -22,7 +22,7 @@ class GameWaitingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const GamePhaseAppbar(
-        title: "Waiting for players...",
+        title: "Waiting for others...",
         showBackButton: true,
         actionText: "Cancel Game",
       ),
@@ -148,7 +148,7 @@ class GameWaitingPage extends StatelessWidget {
 
         if (!isCreator) return const SizedBox.shrink();
 
-        final canStartGame = gameState.participants.length >= 2;
+        final canStartGame = gameState.participants.length >= 1;
 
         return SizedBox(
           width: double.infinity,
