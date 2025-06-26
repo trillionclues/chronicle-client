@@ -65,11 +65,23 @@ class _HomePageState extends State<HomePage> {
                   url: state.userModel?.photoUrl ?? "",
                 ),
                 ChronicleSpacing.horizontalSM,
-                Text(
-                  state.userModel?.name ?? "",
-                  style: ChronicleTextStyles.bodyLarge(context).copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Welcome back",
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    Text(
+                      state.userModel?.name ?? "",
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

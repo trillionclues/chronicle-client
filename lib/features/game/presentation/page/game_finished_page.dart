@@ -129,7 +129,11 @@ class GameFinishedPage extends StatelessWidget {
                 ChronicleSpacing.verticalLG,
                 Center(
                   child: DefaultButton(
-                      onPressed: () => context.push(CreateGamePage.route),
+                      onPressed: () {
+                        Navigator.of(context)
+                            .popUntil((route) => route.isFirst);
+                        context.push(CreateGamePage.route);
+                      },
                       text: "Play Again",
                       backgroundColor: AppColors.primary,
                       textColor: AppColors.surface,

@@ -62,7 +62,7 @@ class GameCanceledPagePage extends StatelessWidget {
             color: AppColors.primary,
           ),
         )
-            : SingleChildScrollView( // <-- Add this
+            : SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
