@@ -3,7 +3,10 @@ import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
+import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
+import 'package:chronicle/core/utils/string_utils.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
@@ -40,8 +43,6 @@ class _GameWritingPageState extends State<GameWritingPage> {
     final gameState = context.read<GameBloc>().state;
 
     if (_userId != null) {
-      // final hasSubmitted = gameState.participants
-      //     .any((p) => p.id == userId && p.hasSubmitted == true);
       final participant = gameState.participants.firstWhere(
         (p) => p.id == _userId,
         orElse: () => throw Exception("User not found in participants"),
@@ -65,16 +66,20 @@ class _GameWritingPageState extends State<GameWritingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const GamePhaseAppbar(
-        showBackButton: false,
-      ),
-      body: _buildBody(context),
-      floatingActionButton: _buildManualNextPhaseButton(context),
-    );
+    return BlocBuilder<AppModeBloc, AppMode>(builder: (context, currentMode) {
+      return Scaffold(
+        appBar: GamePhaseAppbar(
+          showBackButton: false,
+          actionText: "Writing Fragment",
+          currentMode: currentMode,
+        ),
+        body: _buildBody(context, currentMode),
+        floatingActionButton: _buildManualNextPhaseButton(context),
+      );
+    });
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, AppMode currentMode) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: MultiBlocListener(
@@ -148,16 +153,17 @@ class _GameWritingPageState extends State<GameWritingPage> {
                           padding:
                               EdgeInsets.all(ChronicleSpacing.screenPadding),
                           children: [
-                            _buildStorySection(context, state),
+                            _buildStorySection(context, state, currentMode),
                             ChronicleSpacing.verticalXL,
                             if (!_hasSubmitted)
-                              _buildWritingSection(context, state),
+                              _buildWritingSection(context, state, currentMode),
                             ChronicleSpacing.verticalXL,
                             const ParticipantsWidget(),
                           ],
                         ),
                       ),
-                      if (!_hasSubmitted) _buildSubmitButton(context, state),
+                      if (!_hasSubmitted)
+                        _buildSubmitButton(context, state, currentMode),
                     ],
                   );
           },
@@ -189,6 +195,11 @@ class _GameWritingPageState extends State<GameWritingPage> {
                 // context.read<GameBloc>().add(ManualNextPhaseEvent());
               },
               backgroundColor: AppColors.secondary,
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+              ),
+              heroTag: 'nextPhaseButton',
               tooltip: 'Advance to next phase',
               child: const Icon(Icons.done, color: AppColors.surface),
             );
@@ -198,19 +209,24 @@ class _GameWritingPageState extends State<GameWritingPage> {
     );
   }
 
-  Widget _buildStorySection(BuildContext context, GameState state) {
+  Widget _buildStorySection(
+      BuildContext context, GameState state, AppMode currentMode) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Story so far:",
+        Text("${currentMode.displayName} so far:",
             style: ChronicleTextStyles.bodyLarge(context)
                 .copyWith(fontWeight: FontWeight.bold)),
         ChronicleSpacing.verticalMD,
         if (state.history.isEmpty)
-          Text("No story yet - be the first to contribute!",
+          Text(
+              "No ${currentMode.displayName} yet - be the first to contribute!",
               style: ChronicleTextStyles.bodyMedium(context))
         else
-          const HistoryWidget(),
+          const HistoryWidget(
+              showOnlyWinningFragments: true,
+              showAuthors: false,
+              showRoundNumbers: true),
       ],
     );
   }
@@ -252,7 +268,8 @@ class _GameWritingPageState extends State<GameWritingPage> {
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context, GameState state) {
+  Widget _buildSubmitButton(
+      BuildContext context, GameState state, AppMode currentMode) {
     return Container(
       padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
       child: SizedBox(
@@ -269,14 +286,16 @@ class _GameWritingPageState extends State<GameWritingPage> {
                 },
           loading: state.status == GameStatus.loading,
           backgroundColor: AppColors.primary,
-          text: "Submit Fragment",
+          text: StringUtils.getSubmitButtonText(currentMode),
           textColor: AppColors.surface,
+          padding: const EdgeInsets.all(ChronicleSpacing.sm),
         ),
       ),
     );
   }
 
-  Widget _buildWritingSection(BuildContext context, GameState state) {
+  Widget _buildWritingSection(
+      BuildContext context, GameState state, AppMode currentMode) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -293,7 +312,7 @@ class _GameWritingPageState extends State<GameWritingPage> {
           minLines: 4,
           maxLength: 255,
           hintText:
-              "${state.history.isNotEmpty ? "Start the story!" : "Continue the story"} Be the first to add a twist...",
+              "${state.history.isEmpty ? "Start the ${currentMode.displayName}!" : "Continue the ${currentMode.displayName}"} Be the first to add a twist...",
           borderRadius: BorderRadius.circular(ChronicleSizes.smallBorderRadius),
           onChanged: (value) {
             setState(() => _charCount = value.length);

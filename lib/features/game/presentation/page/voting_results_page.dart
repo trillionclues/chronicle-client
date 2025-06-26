@@ -339,6 +339,7 @@ class _VotingResultsPageState extends State<VotingResultsPage>
               onPressed: () {
                 // context.read<GameBloc>().add(ProceedToNextPhaseEvent());
               },
+              padding: const EdgeInsets.all(ChronicleSpacing.sm),
             ),
             SizedBox(height: ChronicleSpacing.md),
             Text(

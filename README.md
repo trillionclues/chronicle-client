@@ -1,19 +1,22 @@
 # Chronicle
 
-Chronicle - Create stories together
+Chronicle - Collaborative Content Creation Platform
 
 ## Overview
 
-Chronicle is a collaborative storytelling mobile app that allows users to create and share stories together. The app leverages Firebase for authentication and backend services, and it is built using Flutter for a seamless cross-platform experience.
+Chronicle is a versatile collaborative platform that enables groups to:
+- Create stories together (original mode)
+- Debate positions and vote on arguments
+- Co-author articles section by section
+- Make team decisions through structured proposals
 
-## Features
+## Key Features
 
-- **User Authentication**: Secure user authentication using Firebase.
-- **Google Sign-In**: Easy login with Google accounts.
-- **Profile Management**: Users can manage their profiles and view other users' profiles.
-- **Story Creation**: Create and edit stories collaboratively.
-- **Real-time Updates**: Real-time updates and notifications for story changes.
-- **Responsive UI**: A responsive and intuitive user interface.
+- **Multiple Modes**: Switch between storytelling, debating, article writing, and decision-making
+- **Flexible Voting**: Adaptable voting systems for each use case
+- **Real-time Collaboration**: Instant updates across all devices
+- **User Profiles**: Manage identity and view contributions
+- **Cross-platform**: Works on iOS and Android
 
 ## Getting Started
 
@@ -63,18 +66,40 @@ Chronicle is a collaborative storytelling mobile app that allows users to create
     flutter run -d ios
     ```
 
-## Project Structure
+## Using Different Modes
 
-- `lib/core`: Core functionalities and utilities.
-- `lib/features/auth`: Authentication-related features.
-- `lib/features/home`: Home page and related features.
-- `lib/core/di`: Dependency injection setup.
-- `lib/core/router`: App routing configuration.
-- `lib/core/theme`: Theme and styling.
+### 1. Story Mode (Default)
+- Create branching narratives with friends
+- Vote on the best story directions
+- Combine winning fragments into complete tales
 
-## Contributing
+### 2. Debate Mode
+- Submit positions on any topic
+- Vote for the most compelling arguments
+- See ranked results of the discussion
 
-We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
+### 3. Article Mode
+- Collaboratively write long-form content
+- Contribute sections or paragraphs
+- Vote on the best versions of each part
+
+### 4. Decision Mode
+- Propose options for team decisions
+- Structured voting process
+- Clear audit trail of all suggestions
+
+## UI Customization
+
+The app automatically adapts its interface based on the current mode:
+- Button labels change to match context
+- Submission forms adjust requirements
+- Voting interfaces optimize for each use case
+
+## Roadmap
+- Add custom voting systems
+- Enable multimedia fragments
+- Implement threaded discussions
+- Export final content in multiple formats
 
 ## License
 
@@ -88,8 +113,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 
 For any inquiries, please contact us at [support@chronicle.com](mailto:exceln646@gmail.com).
-
-## Bonus Features
-- i18n support for different languages contributions. [i18n Internationalization](https://react.i18next.com/)
-- Dark mode support.
-- Unit and widget tests for better code quality.

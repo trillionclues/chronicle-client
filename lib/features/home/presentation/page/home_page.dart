@@ -3,9 +3,12 @@ import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/circle_user_avatar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
+import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/core/utils/chronicle_appbar.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/core/utils/game_utils.dart';
+import 'package:chronicle/core/utils/string_utils.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
@@ -38,13 +41,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: _buildJoinGame(context),
-    );
+    return BlocBuilder<AppModeBloc, AppMode>(builder: (context, currentMode) {
+      return Scaffold(
+        appBar: _buildAppBar(context, currentMode),
+        body: _buildBody(context, currentMode),
+      );
+    });
   }
 
-  AppBar _buildAppBar(BuildContext context) {
+  AppBar _buildAppBar(BuildContext context, AppMode currentMode) {
     return ChronicleAppBar.responsiveAppBar(
       context: context,
       titleWidget: BlocBuilder<UserBloc, UserState>(
@@ -72,6 +77,40 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       actions: [
+        PopupMenuButton(
+            icon: Icon(Icons.apps),
+            onSelected: (AppMode mode) {
+              context.read<AppModeBloc>().add(ChangeAppModeEvent(mode));
+            },
+            itemBuilder: (BuildContext context) {
+              return AppMode.values.map((AppMode mode) {
+                return PopupMenuItem<AppMode>(
+                  value: mode,
+                  child: Row(
+                    children: [
+                      Icon(
+                        currentMode == mode
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        size: 18,
+                      ),
+                      ChronicleSpacing.horizontalSM,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(mode.displayName),
+                          Text(
+                            mode.description,
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              }).toList();
+            }),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.sm),
           child: IconButton(
@@ -86,7 +125,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildJoinGame(BuildContext context) {
+  Widget _buildBody(BuildContext context, AppMode currentMode) {
     return BlocListener<HomeBloc, HomeState>(
       listener: (context, state) {
         if (state.status == HomeStatus.successfullyCheckedGame) {
@@ -128,14 +167,34 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(ChronicleSpacing.screenPadding),
         child: Column(
           children: [
+            Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(ChronicleSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius:
+                      BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "Current Mode: ${currentMode.displayName}",
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                    )
+                  ],
+                )),
             ChronicleSpacing.verticalLG,
             Text(
-              "Join via code",
+              StringUtils.getJoinButtonText(currentMode),
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             ChronicleSpacing.verticalMD,
             DefaultTextField(
-              hintText: "Enter game code",
+              hintText: "Enter ${currentMode.displayName.toLowerCase()} code",
               fieldType: "textField",
               controller: controller,
               onSubmitted: (text) {
@@ -163,13 +222,11 @@ class _HomePageState extends State<HomePage> {
             ),
             ChronicleSpacing.verticalLG,
             DefaultButton(
-              text: "Create new game",
+              text: StringUtils.getCreateButtonText(currentMode),
               onPressed: () => context.push(CreateGamePage.route),
               backgroundColor: AppColors.primary,
               textColor: AppColors.surface,
-              padding: const EdgeInsets.symmetric(
-                  vertical: ChronicleSpacing.md,
-                  horizontal: ChronicleSpacing.sm),
+              padding: const EdgeInsets.all(ChronicleSpacing.sm),
             )
           ],
         ),

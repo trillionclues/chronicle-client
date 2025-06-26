@@ -1,6 +1,7 @@
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
 import 'package:chronicle/features/game/presentation/page/game_canceled_page.dart';
+import 'package:chronicle/features/game/presentation/page/game_finished_page.dart';
 import 'package:chronicle/features/game/presentation/page/game_voting_page.dart';
 import 'package:chronicle/features/game/presentation/page/game_waiting_page.dart';
 import 'package:chronicle/features/game/presentation/page/game_writing_page.dart';
@@ -27,6 +28,8 @@ class GamePageContent extends StatelessWidget {
               return const GameVotingPage();
             case GamePhase.canceled:
               return const GameCanceledPagePage();
+              case GamePhase.finished:
+                return const GameFinishedPage();
             default:
               return const Center(child: CircularProgressIndicator());
           }

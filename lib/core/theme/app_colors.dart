@@ -6,7 +6,7 @@ class AppColors {
   static const Color background = Color(0xFFF5F5F5);
   static const Color textColor = Color(0xFF1E1E1E);
   static const Color surface = Color(0xFFFFFFFF);
-static const Color diverColor = Color(0xFFBDBDBD);
+static const Color dividerColor = Color(0xFFBDBDBD);
   static const Color errorColor = Color(0xFFFF4B4B);
 }
 

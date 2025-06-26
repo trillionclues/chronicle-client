@@ -1,4 +1,5 @@
 import 'package:chronicle/core/theme/app_colors.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/core/utils/snackbar_extensions.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
@@ -7,7 +8,9 @@ import 'package:flutter/services.dart';
 
 class GameCodeCardWidget extends StatelessWidget {
   final GameState state;
-  const GameCodeCardWidget({super.key, required this.state});
+  final String mode;
+
+  const GameCodeCardWidget({super.key, required this.state, required this.mode});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class GameCodeCardWidget extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            "Game Code",
+            "$mode Code",
             style: ChronicleTextStyles.bodyMedium(context).copyWith(
               color: Color(0xFF8B5A00),
               fontWeight: FontWeight.w500,
@@ -54,7 +57,7 @@ class GameCodeCardWidget extends StatelessWidget {
           TextButton.icon(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: "${state.gameCode}"));
-              context.showGameSnackBar("Game code copied!");
+              context.showGameSnackBar("$mode code copied!");
             },
             icon: Icon(
               Icons.copy,

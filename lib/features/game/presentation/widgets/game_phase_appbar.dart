@@ -1,5 +1,6 @@
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
 import 'package:chronicle/core/utils/chronicle_appbar.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/core/utils/game_utils.dart';
@@ -15,13 +16,14 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final bool showBackButton;
   final String? actionText;
+  final AppMode currentMode;
 
-  const GamePhaseAppbar({
-    super.key,
-    this.title,
-    this.showBackButton = true,
-    this.actionText,
-  });
+  const GamePhaseAppbar(
+      {super.key,
+      this.title,
+      this.showBackButton = true,
+      this.actionText,
+      required this.currentMode});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -66,7 +68,7 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
           Expanded(
             child: Text(
               title!,
-              style: ChronicleTextStyles.bodyLarge(context),
+              style: ChronicleTextStyles.bodyMedium(context),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -101,7 +103,7 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   List<Widget>? _buildActions(BuildContext context) {
     // Only show exit action when there's no title (during game phases != waiting)
-    if (title == null) {
+    if (title == null && actionText == "Writing Fragment") {
       return [
         IconButton(
           icon: Icon(Icons.exit_to_app, size: ChronicleSizes.iconLarge),
@@ -116,8 +118,9 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text("Leave Game?"),
-        content: const Text("Are you sure you want to leave this game?"),
+        title: Text("Leave ${currentMode.displayName}?"),
+        content: Text(
+            "Are you sure you want to leave this ${currentMode.displayName}?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -129,7 +132,7 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
               context.read<GameBloc>().add(LeaveGameEvent());
               ChronicleSnackBar.showSuccess(
                 context: context,
-                message: "You have left the game.",
+                message: "You have left the ${currentMode.displayName}.",
               );
             },
             child: const Text(
@@ -146,9 +149,9 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text("Cancel Game?"),
-        content: const Text(
-          "Are you sure you want to cancel this game? This will end the game for all players.",
+        title: Text("Cancel ${currentMode.displayName}?"),
+        content: Text(
+          "Are you sure you want to cancel this ${currentMode.displayName?.toLowerCase()}? This will end the ${currentMode.displayName?.toLowerCase()} for all players.",
         ),
         actions: [
           TextButton(
@@ -161,11 +164,11 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
               context.read<GameBloc>().add(CancelGameEvent());
               ChronicleSnackBar.showSuccess(
                 context: context,
-                message: "Game has been cancelled.",
+                message: "${currentMode.displayName} has been cancelled.",
               );
             },
-            child: const Text(
-              "Cancel Game",
+            child: Text(
+              "Cancel ${currentMode.displayName}",
               style: TextStyle(color: AppColors.errorColor),
             ),
           ),

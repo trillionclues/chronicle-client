@@ -55,9 +55,7 @@ class AuthPage extends StatelessWidget {
                   onPressed: () {
                     context.read<UserBloc>().add(LoginWithGoogleEvent());
                   },
-                  padding: const EdgeInsets.symmetric(
-                      vertical: ChronicleSpacing.md,
-                      horizontal: ChronicleSpacing.sm))
+                  padding: const EdgeInsets.all(ChronicleSpacing.sm))
             ],
           ),
         );

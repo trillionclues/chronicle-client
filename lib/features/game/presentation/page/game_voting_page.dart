@@ -1,5 +1,7 @@
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
+import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/game/domain/model/story_fragment_model.dart';
@@ -24,10 +26,12 @@ class _GameVotingPageState extends State<GameVotingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const GamePhaseAppbar(showBackButton: false),
-      body: _buildBody(context),
-    );
+    return BlocBuilder<AppModeBloc, AppMode>(builder: (context, currentMode) {
+      return Scaffold(
+        appBar: GamePhaseAppbar(showBackButton: false, currentMode: currentMode,),
+        body: _buildBody(context),
+      );
+    });
   }
 
   Widget _buildBody(BuildContext context) {
@@ -256,10 +260,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
                         ? AppColors.primary
                         : AppColors.primary.withOpacity(0.1),
                     textColor: isSelected ? Colors.white : AppColors.primary,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: ChronicleSpacing.lg,
-                      vertical: ChronicleSpacing.sm,
-                    ),
+                    padding: const EdgeInsets.all(ChronicleSpacing.sm),
                   ),
               ],
             ),
@@ -316,6 +317,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
 
   void _showVoteConfirmation(
       BuildContext context, StoryFragmentModel fragment) {
+    final gameBloc = context.read<GameBloc>();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -334,9 +336,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              context
-                  .read<GameBloc>()
-                  .add(SubmitVoteEvent(userId: fragment.author?.id ?? ''));
+              gameBloc.add(SubmitVoteEvent(userId: fragment.author?.id ?? ''));
               setState(() {
                 hasVoted = true;
               });

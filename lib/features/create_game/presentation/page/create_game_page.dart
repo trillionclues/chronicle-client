@@ -2,8 +2,11 @@ import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
 import 'package:chronicle/core/ui/widgets/default_text_field.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
+import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/core/utils/chronicle_appbar.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
+import 'package:chronicle/core/utils/string_utils.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_bloc.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_event.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_state.dart';
@@ -31,21 +34,23 @@ class _CreateGamePageState extends State<CreateGamePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: _buildBody(context),
-    );
+    return BlocBuilder<AppModeBloc, AppMode>(builder: (context, currentMode) {
+      return Scaffold(
+        appBar: _buildAppBar(context, currentMode),
+        body: _buildBody(context, currentMode),
+      );
+    });
   }
 
-  AppBar _buildAppBar(BuildContext context) {
+  AppBar _buildAppBar(BuildContext context, AppMode currentMode) {
     return ChronicleAppBar.responsiveAppBar(
       context: context,
-      title: "Create Game",
+      title: "Create ${currentMode.displayName}",
       showBackButton: true,
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, AppMode currentMode) {
     return BlocConsumer<CreateGameBloc, CreateGameState>(
       builder: (context, state) {
         return GestureDetector(
@@ -56,133 +61,11 @@ class _CreateGamePageState extends State<CreateGamePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: ChronicleSpacing.screenPadding,
-                          vertical: ChronicleSpacing.md),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Title",
-                              style: ChronicleTextStyles.bodyMedium(context)
-                                  .copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            ChronicleSpacing.verticalSM,
-                            DefaultTextField(
-                              hintText: "Enter story line",
-                              borderRadius: BorderRadius.circular(
-                                  ChronicleSizes.smallBorderRadius),
-                              minLines: 1,
-                              maxLines: 1,
-                              onChanged: (value) =>
-                                  setState(() => title = value),
-                            ),
-                            ChronicleSpacing.verticalMD,
-                            Text(
-                              "Rounds",
-                              style: ChronicleTextStyles.bodyMedium(context)
-                                  .copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ]),
-                    ),
+                    _buildTitleSection(context, currentMode),
                     ChronicleSpacing.verticalSM,
-                    NumberPicker(
-                      from: 3,
-                      to: 10,
-                      onNumberChanged: (value) =>
-                          setState(() => rounds = value),
-                    ),
+                    _buildRoundsSection(),
                     ChronicleSpacing.verticalLG,
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: ChronicleSpacing.screenPadding,
-                          vertical: ChronicleSpacing.md),
-                      child: Text(
-                        "Round duration (minutes)",
-                        style: ChronicleTextStyles.bodyMedium(context).copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    ChronicleSpacing.verticalSM,
-                    NumberPicker(
-                      from: 3,
-                      to: 10,
-                      onNumberChanged: (value) =>
-                          setState(() => roundDuration = value),
-                    ),
-                    ChronicleSpacing.verticalLG,
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: ChronicleSpacing.screenPadding,
-                          vertical: ChronicleSpacing.md),
-                      child: Text(
-                        "Voting duration (minutes)",
-                        style: ChronicleTextStyles.bodyMedium(context).copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    ChronicleSpacing.verticalSM,
-                    NumberPicker(
-                      from: 2,
-                      to: 10,
-                      onNumberChanged: (value) =>
-                          setState(() => votingDuration = value),
-                    ),
-                    ChronicleSpacing.verticalLG,
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: ChronicleSpacing.screenPadding,
-                          vertical: ChronicleSpacing.md),
-                      child: Text(
-                        "Maximum participants",
-                        style: ChronicleTextStyles.bodyMedium(context).copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    ChronicleSpacing.verticalSM,
-                    NumberPicker(
-                      from: 3,
-                      to: 10,
-                      onNumberChanged: (value) =>
-                          setState(() => maximumParticipants = value),
-                    ),
-                    ChronicleSpacing.verticalLG,
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: DefaultButton(
-                          text: "Create Game",
-                          loading: state.status == CreateGameStatus.loading,
-                          onPressed: title.isEmpty
-                              ? () {
-                                  ChronicleSnackBar.showError(
-                                    context: context,
-                                    message: "Game title cannot be empty.",
-                                  );
-                                }
-                              : () {
-                                  context.read<CreateGameBloc>().add(
-                                      CreateGameEvent(
-                                          title: title,
-                                          rounds: rounds,
-                                          roundDuration: roundDuration,
-                                          votingDuration: votingDuration,
-                                          maximumParticipants:
-                                              maximumParticipants));
-                                },
-                          backgroundColor: AppColors.primary,
-                          textColor: AppColors.surface,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: ChronicleSpacing.md,
-                              horizontal: ChronicleSpacing.sm)),
-                    ),
+                    _buildSubmitButton(context, state, currentMode)
                   ],
                 ),
               ),
@@ -193,7 +76,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
           if (state.createdGameCode != null) {
             ChronicleSnackBar.showSuccess(
               context: context,
-              message: "Game created successfully!",
+              message: "${currentMode.displayName} created successfully!",
             );
             // delay before navigating
             Future.delayed(
@@ -212,6 +95,133 @@ class _CreateGamePageState extends State<CreateGamePage> {
           );
         }
       },
+    );
+  }
+
+  Widget _buildTitleSection(BuildContext context, AppMode currentMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: ChronicleSpacing.screenPadding,
+          vertical: ChronicleSpacing.md),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          "Title",
+          style: ChronicleTextStyles.bodyMedium(context).copyWith(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        ChronicleSpacing.verticalSM,
+        DefaultTextField(
+          hintText: "Enter ${currentMode.displayName.toLowerCase()} title",
+          borderRadius: BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+          minLines: 1,
+          maxLines: 1,
+          onChanged: (value) => setState(() => title = value),
+        ),
+        ChronicleSpacing.verticalMD,
+        Text(
+          "Rounds",
+          style: ChronicleTextStyles.bodyMedium(context).copyWith(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _buildRoundsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        NumberPicker(
+          from: 3,
+          to: 10,
+          onNumberChanged: (value) => setState(() => rounds = value),
+        ),
+        ChronicleSpacing.verticalLG,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: ChronicleSpacing.screenPadding,
+              vertical: ChronicleSpacing.md),
+          child: Text(
+            "Round duration (minutes)",
+            style: ChronicleTextStyles.bodyMedium(context).copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        ChronicleSpacing.verticalSM,
+        NumberPicker(
+          from: 3,
+          to: 10,
+          onNumberChanged: (value) => setState(() => roundDuration = value),
+        ),
+        ChronicleSpacing.verticalLG,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: ChronicleSpacing.screenPadding,
+              vertical: ChronicleSpacing.md),
+          child: Text(
+            "Voting duration (minutes)",
+            style: ChronicleTextStyles.bodyMedium(context).copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        ChronicleSpacing.verticalSM,
+        NumberPicker(
+          from: 2,
+          to: 10,
+          onNumberChanged: (value) => setState(() => votingDuration = value),
+        ),
+        ChronicleSpacing.verticalLG,
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: ChronicleSpacing.screenPadding,
+              vertical: ChronicleSpacing.md),
+          child: Text(
+            "Maximum participants",
+            style: ChronicleTextStyles.bodyMedium(context).copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        ChronicleSpacing.verticalSM,
+        NumberPicker(
+          from: 3,
+          to: 10,
+          onNumberChanged: (value) =>
+              setState(() => maximumParticipants = value),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubmitButton(
+      BuildContext context, CreateGameState state, AppMode currentMode) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: DefaultButton(
+          text: StringUtils.getCreateButtonText(currentMode),
+          loading: state.status == CreateGameStatus.loading,
+          onPressed: title.isEmpty
+              ? () {
+                  ChronicleSnackBar.showError(
+                    context: context,
+                    message: "${currentMode.displayName} title cannot be empty.",
+                  );
+                }
+              : () {
+                  context.read<CreateGameBloc>().add(CreateGameEvent(
+                      title: title,
+                      rounds: rounds,
+                      roundDuration: roundDuration,
+                      votingDuration: votingDuration,
+                      maximumParticipants: maximumParticipants));
+                },
+          backgroundColor: AppColors.primary,
+          textColor: AppColors.surface,
+          padding: const EdgeInsets.all(ChronicleSpacing.sm)),
     );
   }
 }

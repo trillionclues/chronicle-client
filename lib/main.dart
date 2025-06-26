@@ -1,6 +1,8 @@
 import 'package:chronicle/core/di/get_it.dart';
 import 'package:chronicle/core/router/app_router.dart';
 import 'package:chronicle/core/theme/app_theme.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
+import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
@@ -23,7 +25,8 @@ void main() async {
   setup();
   runApp(MultiBlocProvider(
     providers: [
-      BlocProvider(create:(context) => getIt<UserBloc>()..add(GetUserEvent())),
+      BlocProvider(create: (_) => AppModeBloc()),
+      BlocProvider(create: (context) => getIt<UserBloc>()..add(GetUserEvent())),
       BlocProvider(create: (context) => getIt<CreateGameBloc>()),
       BlocProvider(create: (context) => getIt<HomeBloc>()),
     ],

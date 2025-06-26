@@ -1,5 +1,7 @@
 import 'package:chronicle/features/auth/domain/model/user_model.dart';
 import 'package:chronicle/features/game/domain/model/participant_model.dart';
+import 'package:chronicle/features/game/domain/model/story_fragment_model.dart';
+import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
 
 class GameUtils {
   static bool isCreator(UserModel user, List<ParticipantModel> participants) {
@@ -36,5 +38,28 @@ class GameUtils {
     final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
     final remainingSeconds = (seconds % 60).toString().padLeft(2, '0');
     return '$minutes:$remainingSeconds remaining';
+  }
+
+  static List<StoryFragmentModel> extractWinningFragments(GameState state) {
+    final winningFragments = <StoryFragmentModel>[];
+
+    // group fragments by round
+    final rounds = state.history.fold<Map<int, List<StoryFragmentModel>>>({},
+        (map, fragment) {
+      map.putIfAbsent(fragment.round, () => []).add(fragment);
+      return map;
+    });
+
+    // For each round, find the winning fragment
+    for (var round in rounds.keys.toList()..sort()) {
+      final winner = rounds[round]
+          ?.firstWhere((f) => f.isWinner, orElse: () => rounds[round]!.first);
+
+      if (winner != null) {
+        winningFragments.add(winner);
+      }
+    }
+
+    return winningFragments;
   }
 }

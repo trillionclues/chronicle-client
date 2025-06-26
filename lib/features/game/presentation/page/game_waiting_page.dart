@@ -2,8 +2,11 @@ import 'package:chronicle/core/socket_manager.dart';
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
+import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/core/utils/game_utils.dart';
+import 'package:chronicle/core/utils/string_utils.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
@@ -20,17 +23,20 @@ class GameWaitingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const GamePhaseAppbar(
-        title: "Waiting for others...",
-        showBackButton: true,
-        actionText: "Cancel Game",
-      ),
-      body: _buildBody(context),
-    );
+    return BlocBuilder<AppModeBloc, AppMode>(builder: (context, currentMode) {
+      return Scaffold(
+        appBar: GamePhaseAppbar(
+          title: "Waiting for others...",
+          showBackButton: true,
+          actionText: "Cancel ${currentMode.displayName}",
+            currentMode: currentMode
+        ),
+        body: _buildBody(context, currentMode),
+      );
+    });
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, AppMode currentMode) {
     return BlocBuilder<GameBloc, GameState>(
       builder: (context, state) {
         final socketManager = SocketManager();
@@ -48,7 +54,7 @@ class GameWaitingPage extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-              child: GameCodeCardWidget(state: state),
+              child: GameCodeCardWidget(state: state, mode: currentMode.displayName,),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -125,7 +131,7 @@ class GameWaitingPage extends StatelessWidget {
             ),
             Container(
               padding: EdgeInsets.all(ChronicleSpacing.screenPadding),
-              child: _buildStartGameButton(context, state),
+              child: _buildStartGameButton(context, state, currentMode),
             ),
           ],
         );
@@ -133,7 +139,7 @@ class GameWaitingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStartGameButton(BuildContext context, GameState gameState) {
+  Widget _buildStartGameButton(BuildContext context, GameState gameState, AppMode currentMode) {
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, userState) {
         // Safety check to prevent crashes
@@ -148,7 +154,7 @@ class GameWaitingPage extends StatelessWidget {
 
         if (!isCreator) return const SizedBox.shrink();
 
-        final canStartGame = gameState.participants.length >= 1;
+        final canStartGame = gameState.participants.length >= 2;
 
         return SizedBox(
           width: double.infinity,
@@ -164,8 +170,9 @@ class GameWaitingPage extends StatelessWidget {
             },
             loading: gameState.status == GameStatus.loading,
             backgroundColor: AppColors.primary,
-            text: "Start Game",
+            text:StringUtils.getStartButtonText(currentMode),
             textColor: AppColors.surface,
+            padding: const EdgeInsets.all(ChronicleSpacing.sm),
           ),
         );
       },
