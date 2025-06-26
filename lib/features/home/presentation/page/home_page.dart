@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/chronicle_snackbar.dart';
 import 'package:chronicle/core/ui/widgets/circle_user_avatar.dart';
@@ -45,6 +47,7 @@ class _HomePageState extends State<HomePage> {
       return Scaffold(
         appBar: _buildAppBar(context, currentMode),
         body: _buildBody(context, currentMode),
+        backgroundColor: AppColors.background,
       );
     });
   }
@@ -59,29 +62,48 @@ class _HomePageState extends State<HomePage> {
                 horizontal: ChronicleSpacing.screenPadding),
             child: Row(
               children: [
-                CircleUserAvatar(
-                  width: ChronicleSizes.responsiveAvatarSize(context),
-                  height: ChronicleSizes.responsiveAvatarSize(context),
-                  url: state.userModel?.photoUrl ?? "",
+                Hero(
+                  tag: 'user_avatar',
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: CircleUserAvatar(
+                      width: ChronicleSizes.responsiveAvatarSize(context),
+                      height: ChronicleSizes.responsiveAvatarSize(context),
+                      url: state.userModel?.photoUrl ?? "",
+                    ),
+                  ),
                 ),
                 ChronicleSpacing.horizontalSM,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Welcome back",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey.shade600,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Welcome back,',
+                        style: ChronicleTextStyles.bodySmall(context).copyWith(
+                          color: AppColors.textColor.withOpacity(0.7),
+                          fontWeight: FontWeight.w300,
+                        ),
                       ),
-                    ),
-                    Text(
-                      state.userModel?.name ?? "",
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                      Text(
+                        state.userModel?.name ?? "",
+                        style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textColor,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -89,47 +111,93 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       actions: [
-        PopupMenuButton(
-            icon: Icon(Icons.apps),
-            onSelected: (AppMode mode) {
-              context.read<AppModeBloc>().add(ChangeAppModeEvent(mode));
-            },
-            itemBuilder: (BuildContext context) {
-              return AppMode.values.map((AppMode mode) {
-                return PopupMenuItem<AppMode>(
-                  value: mode,
-                  child: Row(
-                    children: [
-                      Icon(
-                        currentMode == mode
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_unchecked,
-                        size: 18,
+        Container(
+          margin: EdgeInsets.only(right: ChronicleSpacing.sm),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: PopupMenuButton(
+              icon: Icon(
+                Icons.apps_rounded,
+                color: AppColors.primary,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+              ),
+              elevation: 8,
+              shadowColor: Colors.black.withOpacity(0.15),
+              onSelected: (AppMode mode) {
+                context.read<AppModeBloc>().add(ChangeAppModeEvent(mode));
+              },
+              itemBuilder: (BuildContext context) {
+                return AppMode.values.map((AppMode mode) {
+                  return PopupMenuItem<AppMode>(
+                    value: mode,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: ChronicleSpacing.sm,
                       ),
-                      ChronicleSpacing.horizontalSM,
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
+                      child: Row(
                         children: [
-                          Text(mode.displayName),
-                          Text(
-                            mode.description,
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 200),
+                            child: Icon(
+                              currentMode == mode
+                                  ? Icons.radio_button_checked_rounded
+                                  : Icons.radio_button_unchecked_rounded,
+                              size: 20,
+                              color: currentMode == mode
+                                  ? AppColors.primary
+                                  : AppColors.textColor.withOpacity(0.5),
+                            ),
                           ),
+                          ChronicleSpacing.horizontalSM,
+                          Expanded(
+                              child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                mode.displayName,
+                                style: TextStyle(
+                                  fontWeight: currentMode == mode
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                  color: currentMode == mode
+                                      ? AppColors.primary
+                                      : AppColors.textColor,
+                                ),
+                              ),
+                              Text(
+                                mode.description,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textColor.withOpacity(0.6),
+                                ),
+                              ),
+                            ],
+                          ))
                         ],
-                      )
-                    ],
-                  ),
-                );
-              }).toList();
-            }),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.sm),
+                      ),
+                    ),
+                  );
+                }).toList();
+              }),
+        ),
+        Container(
+          margin: EdgeInsets.only(right: ChronicleSpacing.sm),
+          decoration: BoxDecoration(
+            color: AppColors.errorColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: IconButton(
             onPressed: () => onLogoutPressed(context),
             icon: Icon(
-              Icons.logout,
+              Icons.logout_rounded,
               size: ChronicleSizes.responsiveIconSize(context),
+              color: AppColors.errorColor,
             ),
           ),
         )
@@ -158,15 +226,37 @@ class _HomePageState extends State<HomePage> {
             context: context,
             barrierDismissible: false,
             builder: (context) {
-              return Center(
-                child: Container(
-                  padding: const EdgeInsets.all(ChronicleSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius:
-                        BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+              return BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(ChronicleSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator.adaptive(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        ),
+                        SizedBox(height: ChronicleSpacing.md),
+                        Text(
+                          'Joining game...',
+                          style: ChronicleTextStyles.bodyMedium(context),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: CircularProgressIndicator.adaptive(),
                 ),
               );
             },
@@ -175,73 +265,131 @@ class _HomePageState extends State<HomePage> {
           context.pop();
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.all(ChronicleSpacing.screenPadding),
-        child: Column(
-          children: [
-            Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(ChronicleSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius:
-                      BorderRadius.circular(ChronicleSizes.smallBorderRadius),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      "Current Mode: ${currentMode.displayName}",
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
+      child: CustomScrollView(
+        physics: BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(ChronicleSpacing.screenPadding),
+              child: Column(
+                children: [
+                  Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(ChronicleSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(
+                            ChronicleSizes.smallBorderRadius),
+                        border: Border.all(
+                            color: AppColors.primary.withOpacity(0.3)),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "Current Mode: ${currentMode.displayName}",
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                          )
+                        ],
+                      )),
+                  ChronicleSpacing.verticalLG,
+                  Text(
+                    StringUtils.getJoinButtonText(currentMode),
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  ChronicleSpacing.verticalMD,
+                  DefaultTextField(
+                    hintText:
+                        "Enter ${currentMode.displayName.toLowerCase()} code",
+                    fieldType: "textField",
+                    controller: controller,
+                    onSubmitted: (text) {
+                      joinGameValidator(text);
+                    },
+                    borderRadius:
+                        BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+                    actionIcon: IconButton(
+                        onPressed: () {
+                          if (controller.text.isNotEmpty) {
+                            context.read<HomeBloc>().add(CheckGameByCodeEvent(
+                                gameCode: controller.text));
+                          }
+                        },
+                        icon: Icon(
+                          Icons.arrow_circle_right_outlined,
+                          size: ChronicleSizes.iconLarge,
+                        )),
+                  ),
+                  ChronicleSpacing.verticalLG,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 1,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                AppColors.dividerColor.withOpacity(0.5),
+                              ],
+                            ),
                           ),
-                    )
-                  ],
-                )),
-            ChronicleSpacing.verticalLG,
-            Text(
-              StringUtils.getJoinButtonText(currentMode),
-              style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.md),
+                        child: Text(
+                          "or",
+                          style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                            color: AppColors.textColor.withOpacity(0.6),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: 1,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.dividerColor.withOpacity(0.5),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),)
+                    ],
+                  ),
+                  ChronicleSpacing.verticalLG,
+                  DefaultButton(
+                    text: StringUtils.getCreateButtonText(currentMode),
+                    onPressed: () => context.push(CreateGamePage.route),
+                    backgroundColor: AppColors.primary,
+                    textColor: AppColors.surface,
+                    padding: const EdgeInsets.all(ChronicleSpacing.sm),
+                  ),
+                  ChronicleSpacing.verticalLG,
+                  _buildGameHistorySection(context),
+                ],
+              ),
             ),
-            ChronicleSpacing.verticalMD,
-            DefaultTextField(
-              hintText: "Enter ${currentMode.displayName.toLowerCase()} code",
-              fieldType: "textField",
-              controller: controller,
-              onSubmitted: (text) {
-                joinGameValidator(text);
-              },
-              borderRadius:
-                  BorderRadius.circular(ChronicleSizes.smallBorderRadius),
-              actionIcon: IconButton(
-                  onPressed: () {
-                    if (controller.text.isNotEmpty) {
-                      context
-                          .read<HomeBloc>()
-                          .add(CheckGameByCodeEvent(gameCode: controller.text));
-                    }
-                  },
-                  icon: Icon(
-                    Icons.arrow_circle_right_outlined,
-                    size: ChronicleSizes.iconLarge,
-                  )),
-            ),
-            ChronicleSpacing.verticalLG,
-            Text(
-              "or",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            ChronicleSpacing.verticalLG,
-            DefaultButton(
-              text: StringUtils.getCreateButtonText(currentMode),
-              onPressed: () => context.push(CreateGamePage.route),
-              backgroundColor: AppColors.primary,
-              textColor: AppColors.surface,
-              padding: const EdgeInsets.all(ChronicleSpacing.sm),
-            )
-          ],
-        ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget  _buildGameHistorySection(context) {
+    return Container(
+      padding: EdgeInsets.all(ChronicleSpacing.sm),
+      child:  Text(
+        "Game History",
+        style: Theme.of(context).textTheme.headlineSmall,
       ),
     );
   }
@@ -259,7 +407,6 @@ class _HomePageState extends State<HomePage> {
                       foregroundColor: AppColors.secondary),
                   onPressed: () => Navigator.pop(context),
                   child: Text("Cancel")),
-              // if logout is loading
               if (context.read<UserBloc>().state.status == UserStatus.loading)
                 Center(
                   child: CircularProgressIndicator(
