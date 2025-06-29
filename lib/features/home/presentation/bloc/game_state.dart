@@ -3,7 +3,9 @@ import 'package:equatable/equatable.dart';
 
 enum HomeStatus {
   initial,
-  loading,
+  loadingJoinGame,
+  loadingActiveGames,
+  loadingCompletedGames,
   success,
   successfullyCheckedGame,
   error,
@@ -13,12 +15,15 @@ class HomeState extends Equatable {
   final HomeStatus status;
   final String? errorMessage;
   final GameModel? gameModel;
+  final List<GameModel> activeGames;
+  final List<GameModel> completedGames;
 
-  const HomeState._({
-    required this.status,
-    this.errorMessage,
-    this.gameModel,
-  });
+  const HomeState._(
+      {required this.status,
+      this.errorMessage,
+      this.gameModel,
+      this.activeGames = const [],
+      this.completedGames = const []});
 
   factory HomeState.initial() {
     return const HomeState._(
@@ -30,11 +35,15 @@ class HomeState extends Equatable {
     HomeStatus? status,
     String? errorMessage,
     GameModel? gameModel,
+    List<GameModel>? activeGames,
+    List<GameModel>? completedGames,
   }) =>
       HomeState._(
         status: status ?? this.status,
         errorMessage: errorMessage ?? this.errorMessage,
         gameModel: gameModel ?? this.gameModel,
+        activeGames: activeGames ?? this.activeGames,
+        completedGames: completedGames ?? this.completedGames,
       );
 
   @override
@@ -42,5 +51,7 @@ class HomeState extends Equatable {
         status,
         errorMessage,
         gameModel,
+        activeGames,
+        completedGames,
       ];
 }

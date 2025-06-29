@@ -65,7 +65,7 @@ class GameFinishedPage extends StatelessWidget {
                 ChronicleSpacing.verticalSM,
                 Center(
                   child: Text(
-                    'Created by ${participants.length} amazing storytellers',
+                    'Created by ${participants.length} amazing storyteller${participants.length > 1 ? 's' : ''}.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.textColor.withOpacity(0.6),
                         ),

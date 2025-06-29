@@ -1,5 +1,7 @@
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/ui/widgets/default_button.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
+import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/features/game/domain/model/story_fragment_model.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_bloc.dart';
@@ -49,38 +51,42 @@ class _VotingResultsPageState extends State<VotingResultsPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: GamePhaseAppbar(
-        showBackButton: false,
-      ),
-      body: BlocBuilder<GameBloc, GameState>(builder: (context, state) {
-        final currentRoundFragments =
-            state.history.where((f) => f.round == state.currentRound).toList();
+    return BlocBuilder<AppModeBloc, AppMode>(builder: (context, currentMode) {
+      return Scaffold(
+        appBar: GamePhaseAppbar(
+          showBackButton: false,
+          currentMode: currentMode,
+        ),
+        body: BlocBuilder<GameBloc, GameState>(builder: (context, state) {
+          final currentRoundFragments = state.history
+              .where((f) => f.round == state.currentRound)
+              .toList();
 
-        currentRoundFragments.sort((a, b) => b.votes.compareTo(a.votes));
+          currentRoundFragments.sort((a, b) => b.votes.compareTo(a.votes));
 
-        final winner = currentRoundFragments.isNotEmpty
-            ? currentRoundFragments.first
-            : null;
+          final winner = currentRoundFragments.isNotEmpty
+              ? currentRoundFragments.first
+              : null;
 
-        return AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(0, _slideAnimation.value),
-                child: Opacity(
-                  opacity: _fadeAnimation.value,
-                  child: _buildContent(
-                    context,
-                    state,
-                    winner,
-                    currentRoundFragments,
+          return AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(0, _slideAnimation.value),
+                  child: Opacity(
+                    opacity: _fadeAnimation.value,
+                    child: _buildContent(
+                      context,
+                      state,
+                      winner,
+                      currentRoundFragments,
+                    ),
                   ),
-                ),
-              );
-            });
-      }),
-    );
+                );
+              });
+        }),
+      );
+    });
   }
 
   Widget _buildContent(

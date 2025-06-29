@@ -19,6 +19,7 @@ import 'package:chronicle/features/game/presentation/page/game_page.dart';
 import 'package:chronicle/features/home/presentation/bloc/game_state.dart';
 import 'package:chronicle/features/home/presentation/bloc/home_bloc.dart';
 import 'package:chronicle/features/home/presentation/bloc/home_event.dart';
+import 'package:chronicle/features/home/presentation/widget/game_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -221,7 +222,8 @@ class _HomePageState extends State<HomePage> {
           );
         }
 
-        if (state.status == HomeStatus.loading) {
+        if (state.status == HomeStatus.loadingJoinGame &&
+            state.gameModel == null) {
           showDialog(
             context: context,
             barrierDismissible: false,
@@ -261,8 +263,11 @@ class _HomePageState extends State<HomePage> {
               );
             },
           );
-        } else if (state.status != HomeStatus.initial) {
-          context.pop();
+        } else if (state.status != HomeStatus.successfullyCheckedGame &&
+            state.status != HomeStatus.loadingJoinGame) {
+          if (Navigator.of(context, rootNavigator: true).canPop()) {
+            Navigator.of(context, rootNavigator: true).pop();
+          }
         }
       },
       child: CustomScrollView(
@@ -342,10 +347,12 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: ChronicleSpacing.md),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: ChronicleSpacing.md),
                         child: Text(
                           "or",
-                          style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                          style:
+                              ChronicleTextStyles.bodyMedium(context).copyWith(
                             color: AppColors.textColor.withOpacity(0.6),
                             fontWeight: FontWeight.w500,
                           ),
@@ -362,7 +369,8 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
-                        ),)
+                        ),
+                      )
                     ],
                   ),
                   ChronicleSpacing.verticalLG,
@@ -374,7 +382,7 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(ChronicleSpacing.sm),
                   ),
                   ChronicleSpacing.verticalLG,
-                  _buildGameHistorySection(context),
+                  _buildGameHistorySection(context, currentMode),
                 ],
               ),
             ),
@@ -384,14 +392,74 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget  _buildGameHistorySection(context) {
-    return Container(
-      padding: EdgeInsets.all(ChronicleSpacing.sm),
-      child:  Text(
-        "Game History",
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
-    );
+  Widget _buildGameHistorySection(context, AppMode currentMode) {
+    return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+      if ((state.status == HomeStatus.loadingCompletedGames &&
+              state.activeGames.isEmpty) ||
+          (state.status == HomeStatus.loadingActiveGames &&
+              state.completedGames.isEmpty)) {
+        return Center(
+          child: CircularProgressIndicator(
+            color: AppColors.primary,
+          ),
+        );
+      }
+
+      if (state.status == HomeStatus.error &&
+          state.activeGames.isEmpty &&
+          state.completedGames.isEmpty) {
+        return Center(
+          child: Text(
+            state.errorMessage ?? "Failed to load ${currentMode.displayName}s",
+            style: ChronicleTextStyles.bodyMedium(context).copyWith(
+              color: AppColors.errorColor,
+            ),
+          ),
+        );
+      }
+
+      return Container(
+        padding: EdgeInsets.all(ChronicleSpacing.sm),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "${currentMode.displayName} History",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            ChronicleSpacing.verticalMD,
+            if (state.activeGames.isNotEmpty) ...[
+              Text(
+                "Active ${currentMode.displayName == "Story" ? "Stories" : "${currentMode.displayName}s"}",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              ChronicleSpacing.verticalSM,
+              ...state.activeGames.map((game) => GameWidget(gameModel: game))
+            ],
+            if (state.completedGames.isNotEmpty) ...[
+              ChronicleSpacing.verticalLG,
+              Text(
+                "Completed ${currentMode.displayName == "Story" ? "Stories" : "${currentMode.displayName}s"}",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              ChronicleSpacing.verticalSM,
+              ...state.completedGames.map((game) => GameWidget(gameModel: game))
+            ],
+            if (state.activeGames.isEmpty && state.completedGames.isEmpty)
+              Text(
+                "No ${currentMode.displayName == "Story" ? "Stories" : "${currentMode.displayName}s"} yet. Create or join a ${currentMode.displayName} to get started!",
+                style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                  color: AppColors.textColor.withOpacity(0.6),
+                ),
+              )
+          ],
+        ),
+      );
+    });
   }
 
   void onLogoutPressed(BuildContext context) {
@@ -444,6 +512,7 @@ class _HomePageState extends State<HomePage> {
       );
       return;
     }
+    controller.clear();
     context.read<HomeBloc>().add(CheckGameByCodeEvent(gameCode: gameCode));
   }
 }

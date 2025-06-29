@@ -9,6 +9,7 @@ import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/auth/presentation/pages/auth_page.dart';
 import 'package:chronicle/features/create_game/presentation/bloc/create_game_bloc.dart';
 import 'package:chronicle/features/home/presentation/bloc/home_bloc.dart';
+import 'package:chronicle/features/home/presentation/bloc/home_event.dart';
 import 'package:chronicle/features/home/presentation/page/home_page.dart';
 import 'package:chronicle/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,7 +23,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   setup();
+
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(create: (_) => AppModeBloc()),
@@ -38,6 +41,12 @@ void main() async {
         return BlocListener<UserBloc, UserState>(
           listener: (context, state) {
             if (state.status == UserStatus.success) {
+              Future.microtask(() {
+                if (!context.mounted) return;
+                context.read<HomeBloc>()
+                  ..add(GetActiveGamesEvent())
+                  ..add(GetCompletedGamesEvent());
+              });
               AppRouter.router.go(HomePage.route);
             } else if (state.status == UserStatus.error ||
                 state.status == UserStatus.logout) {

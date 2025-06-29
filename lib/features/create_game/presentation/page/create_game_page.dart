@@ -28,7 +28,7 @@ class CreateGamePage extends StatefulWidget {
 class _CreateGamePageState extends State<CreateGamePage> {
   String title = "";
   int rounds = 3;
-  int roundDuration = 2;
+  int roundDuration = 3;
   int votingDuration = 2;
   int maximumParticipants = 3;
 

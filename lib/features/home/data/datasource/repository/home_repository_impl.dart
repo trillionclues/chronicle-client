@@ -14,7 +14,6 @@ class HomeRepositoryImpl extends HomeRepository {
 
   @override
   Future<Either<Failure, GameModel>> checkGameByCode(String gameCode) async {
-
     try {
       var result = await homeRemoteDataSource.checkGameByCode(gameCode);
       return Either.right(result);
@@ -22,6 +21,26 @@ class HomeRepositoryImpl extends HomeRepository {
       return Either.left(GameFailure(message: e.response?.data['error']));
     } catch (e) {
       return Either.left(GameFailure(message: 'Join game failed!'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<GameModel>>> getActiveGames() async {
+    try {
+      var games = await homeRemoteDataSource.getActiveGames(isActive: true);
+      return Either.right(games);
+    } on DioException catch (e) {
+      return Either.left(GameFailure(message: e.response?.data['error']));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<GameModel>>> getCompletedGames() async {
+    try {
+      var games = await homeRemoteDataSource.getActiveGames(isActive: false);
+      return Either.right(games);
+    } on DioException catch (e) {
+      return Either.left(GameFailure(message: e.response?.data['error']));
     }
   }
 }

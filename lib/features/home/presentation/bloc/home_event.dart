@@ -5,3 +5,7 @@ class CheckGameByCodeEvent extends HomeEvent {
 
   CheckGameByCodeEvent({required this.gameCode});
 }
+
+class GetActiveGamesEvent extends HomeEvent {}
+
+class GetCompletedGamesEvent extends HomeEvent {}
