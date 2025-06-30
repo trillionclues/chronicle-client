@@ -3,7 +3,10 @@ import 'package:chronicle/features/create_game/presentation/page/create_game_pag
 import 'package:chronicle/features/game/presentation/page/game_page.dart';
 import 'package:chronicle/features/home/presentation/page/home_page.dart';
 import 'package:chronicle/splash_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+
+final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
 
 class AppRouter {
   static var router = GoRouter(initialLocation: SplashPage.route, routes: [
@@ -36,5 +39,7 @@ class AppRouter {
         return CreateGamePage();
       },
     ),
-  ]);
+  ],  observers: [
+    routeObserver
+  ],);
 }

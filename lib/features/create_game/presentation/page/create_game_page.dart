@@ -78,6 +78,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
               context: context,
               message: "${currentMode.displayName} created successfully!",
             );
+
             // delay before navigating
             Future.delayed(
                 const Duration(

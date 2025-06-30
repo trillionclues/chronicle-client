@@ -208,188 +208,203 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBody(BuildContext context, AppMode currentMode) {
     return BlocListener<HomeBloc, HomeState>(
-      listener: (context, state) {
-        if (state.status == HomeStatus.successfullyCheckedGame) {
-          if (state.gameModel != null) {
-            context.go(GamePage.route(state.gameModel!.gameCode));
+        listenWhen: (previous, current) {
+          return previous.status != current.status;
+        },
+        listener: (context, state) {
+          if (state.status == HomeStatus.successfullyCheckedGame) {
+            if (state.gameModel != null) {
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+              context.go(GamePage.route(state.gameModel!.gameCode));
+            }
           }
-        }
 
-        if (state.status == HomeStatus.error) {
-          ChronicleSnackBar.showError(
-            context: context,
-            message: state.errorMessage ?? "Failed to join game",
-          );
-        }
-
-        if (state.status == HomeStatus.loadingJoinGame &&
-            state.gameModel == null) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) {
-              return BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(ChronicleSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator.adaptive(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(AppColors.primary),
-                        ),
-                        SizedBox(height: ChronicleSpacing.md),
-                        Text(
-                          'Joining game...',
-                          style: ChronicleTextStyles.bodyMedium(context),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        } else if (state.status != HomeStatus.successfullyCheckedGame &&
-            state.status != HomeStatus.loadingJoinGame) {
-          if (Navigator.of(context, rootNavigator: true).canPop()) {
-            Navigator.of(context, rootNavigator: true).pop();
+          if (state.status == HomeStatus.error) {
+            if (Navigator.of(context, rootNavigator: true).canPop()) {
+              Navigator.of(context, rootNavigator: true).pop();
+            }
+            ChronicleSnackBar.showError(
+              context: context,
+              message: state.errorMessage ?? "Failed to join game",
+            );
           }
-        }
-      },
-      child: CustomScrollView(
-        physics: BouncingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(ChronicleSpacing.screenPadding),
-              child: Column(
-                children: [
-                  Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(ChronicleSpacing.md),
+
+          if (state.status == HomeStatus.loadingJoinGame &&
+              state.gameModel == null) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) {
+                return BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(ChronicleSpacing.lg),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(
-                            ChronicleSizes.smallBorderRadius),
-                        border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3)),
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: Offset(0, 8),
+                          ),
+                        ],
                       ),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          CircularProgressIndicator.adaptive(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primary),
+                          ),
+                          SizedBox(height: ChronicleSpacing.md),
                           Text(
-                            "Current Mode: ${currentMode.displayName}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
+                            'Joining game...',
+                            style: ChronicleTextStyles.bodyMedium(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          } else if (state.status != HomeStatus.successfullyCheckedGame &&
+              state.status != HomeStatus.loadingJoinGame) {
+            context.pop();
+          }
+        },
+        child: RefreshIndicator(
+          onRefresh: () async {
+            context.read<HomeBloc>()
+              ..add(GetActiveGamesEvent())
+              ..add(GetCompletedGamesEvent());
+            await Future.delayed(const Duration(milliseconds: 500));
+          },
+          child: CustomScrollView(
+            physics: BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(ChronicleSpacing.screenPadding),
+                  child: Column(
+                    children: [
+                      Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(ChronicleSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(
+                                ChronicleSizes.smallBorderRadius),
+                            border: Border.all(
+                                color: AppColors.primary.withOpacity(0.3)),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Current Mode: ${currentMode.displayName}",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary,
+                                    ),
+                              )
+                            ],
+                          )),
+                      ChronicleSpacing.verticalLG,
+                      Text(
+                        StringUtils.getJoinButtonText(currentMode),
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      ChronicleSpacing.verticalMD,
+                      DefaultTextField(
+                        hintText:
+                            "Enter ${currentMode.displayName.toLowerCase()} code",
+                        fieldType: "textField",
+                        controller: controller,
+                        onSubmitted: (text) {
+                          joinGameValidator(text);
+                        },
+                        borderRadius: BorderRadius.circular(
+                            ChronicleSizes.smallBorderRadius),
+                        actionIcon: IconButton(
+                            onPressed: () {
+                              if (controller.text.isNotEmpty) {
+                                context.read<HomeBloc>().add(
+                                    CheckGameByCodeEvent(
+                                        gameCode: controller.text));
+                              }
+                            },
+                            icon: Icon(
+                              Icons.arrow_circle_right_outlined,
+                              size: ChronicleSizes.iconLarge,
+                            )),
+                      ),
+                      ChronicleSpacing.verticalLG,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    AppColors.dividerColor.withOpacity(0.5),
+                                  ],
                                 ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: ChronicleSpacing.md),
+                            child: Text(
+                              "or",
+                              style: ChronicleTextStyles.bodyMedium(context)
+                                  .copyWith(
+                                color: AppColors.textColor.withOpacity(0.6),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.dividerColor.withOpacity(0.5),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
                           )
                         ],
-                      )),
-                  ChronicleSpacing.verticalLG,
-                  Text(
-                    StringUtils.getJoinButtonText(currentMode),
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  ChronicleSpacing.verticalMD,
-                  DefaultTextField(
-                    hintText:
-                        "Enter ${currentMode.displayName.toLowerCase()} code",
-                    fieldType: "textField",
-                    controller: controller,
-                    onSubmitted: (text) {
-                      joinGameValidator(text);
-                    },
-                    borderRadius:
-                        BorderRadius.circular(ChronicleSizes.smallBorderRadius),
-                    actionIcon: IconButton(
-                        onPressed: () {
-                          if (controller.text.isNotEmpty) {
-                            context.read<HomeBloc>().add(CheckGameByCodeEvent(
-                                gameCode: controller.text));
-                          }
-                        },
-                        icon: Icon(
-                          Icons.arrow_circle_right_outlined,
-                          size: ChronicleSizes.iconLarge,
-                        )),
-                  ),
-                  ChronicleSpacing.verticalLG,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 1,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                AppColors.dividerColor.withOpacity(0.5),
-                              ],
-                            ),
-                          ),
-                        ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: ChronicleSpacing.md),
-                        child: Text(
-                          "or",
-                          style:
-                              ChronicleTextStyles.bodyMedium(context).copyWith(
-                            color: AppColors.textColor.withOpacity(0.6),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                      ChronicleSpacing.verticalLG,
+                      DefaultButton(
+                        text: StringUtils.getCreateButtonText(currentMode),
+                        onPressed: () => context.push(CreateGamePage.route),
+                        backgroundColor: AppColors.primary,
+                        textColor: AppColors.surface,
+                        padding: const EdgeInsets.all(ChronicleSpacing.sm),
                       ),
-                      Expanded(
-                        child: Container(
-                          height: 1,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.dividerColor.withOpacity(0.5),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
+                      ChronicleSpacing.verticalLG,
+                      _buildGameHistorySection(context, currentMode),
                     ],
                   ),
-                  ChronicleSpacing.verticalLG,
-                  DefaultButton(
-                    text: StringUtils.getCreateButtonText(currentMode),
-                    onPressed: () => context.push(CreateGamePage.route),
-                    backgroundColor: AppColors.primary,
-                    textColor: AppColors.surface,
-                    padding: const EdgeInsets.all(ChronicleSpacing.sm),
-                  ),
-                  ChronicleSpacing.verticalLG,
-                  _buildGameHistorySection(context, currentMode),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildGameHistorySection(context, AppMode currentMode) {
@@ -418,46 +433,66 @@ class _HomePageState extends State<HomePage> {
         );
       }
 
-      return Container(
-        padding: EdgeInsets.all(ChronicleSpacing.sm),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${currentMode.displayName} History",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            ChronicleSpacing.verticalMD,
-            if (state.activeGames.isNotEmpty) ...[
-              Text(
-                "Active ${currentMode.displayName == "Story" ? "Stories" : "${currentMode.displayName}s"}",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              ChronicleSpacing.verticalSM,
-              ...state.activeGames.map((game) => GameWidget(gameModel: game))
-            ],
-            if (state.completedGames.isNotEmpty) ...[
-              ChronicleSpacing.verticalLG,
-              Text(
-                "Completed ${currentMode.displayName == "Story" ? "Stories" : "${currentMode.displayName}s"}",
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              ChronicleSpacing.verticalSM,
-              ...state.completedGames.map((game) => GameWidget(gameModel: game))
-            ],
-            if (state.activeGames.isEmpty && state.completedGames.isEmpty)
-              Text(
-                "No ${currentMode.displayName == "Story" ? "Stories" : "${currentMode.displayName}s"} yet. Create or join a ${currentMode.displayName} to get started!",
-                style: ChronicleTextStyles.bodyMedium(context).copyWith(
-                  color: AppColors.textColor.withOpacity(0.6),
-                ),
-              )
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "${currentMode.displayName} History",
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          if (state.activeGames.isNotEmpty) ...[
+            ChronicleSpacing.verticalSM,
+            ...state.activeGames.map((game) => GameWidget(
+                  gameModel: game,
+                  isCompleted: false,
+                  currentMode: currentMode,
+                ))
           ],
-        ),
+          if (state.completedGames.isNotEmpty) ...[
+            ChronicleSpacing.verticalLG,
+            ChronicleSpacing.verticalSM,
+            ...state.completedGames.map((game) => GameWidget(
+                  gameModel: game,
+                  isCompleted: true,
+                  currentMode: currentMode,
+                ))
+          ],
+          if (state.activeGames.isEmpty && state.completedGames.isEmpty)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: ChronicleSpacing.lg,
+                    vertical: ChronicleSpacing.xxl),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.games_outlined,
+                      size: 48,
+                      color: AppColors.textColor.withOpacity(0.3),
+                    ),
+                    SizedBox(height: ChronicleSpacing.md),
+                    Text(
+                      "No ${currentMode.displayName == "Story" ? "Stories" : "${currentMode.displayName}s"} yet.",
+                      style: ChronicleTextStyles.bodyMedium(context).copyWith(
+                        color: AppColors.textColor.withOpacity(0.6),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: ChronicleSpacing.sm),
+                    Text(
+                      "Create or join a ${currentMode.displayName?.toLowerCase()} to get started!",
+                      style: ChronicleTextStyles.bodySmall(context).copyWith(
+                        color: AppColors.textColor.withOpacity(0.4),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+        ],
       );
     });
   }

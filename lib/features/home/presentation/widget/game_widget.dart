@@ -1,4 +1,5 @@
 import 'package:chronicle/core/theme/app_colors.dart';
+import 'package:chronicle/core/utils/app_mode.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/features/game/domain/model/game_model.dart';
 import 'package:chronicle/features/game/presentation/page/game_page.dart';
@@ -7,92 +8,127 @@ import 'package:go_router/go_router.dart';
 
 class GameWidget extends StatelessWidget {
   final GameModel gameModel;
+  final bool isCompleted;
+  final AppMode currentMode;
 
-
-  const GameWidget({super.key, required this.gameModel});
+  const GameWidget({
+    super.key,
+    required this.gameModel,
+    required this.isCompleted,
+    required this.currentMode,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(bottom: ChronicleSpacing.sm),
+      elevation: ChronicleSizes.cardElevation - 3,
+      margin: EdgeInsets.only(bottom: ChronicleSpacing.xs),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(ChronicleSizes.smallBorderRadius),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(ChronicleSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  gameModel.name ?? "Untitled Game",
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ChronicleSpacing.sm,
-                    vertical: ChronicleSpacing.xs,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(ChronicleSizes.smallBorderRadius),
+        onTap: () {
+          if (!isCompleted) {
+            context.go(GamePage.route(gameModel.gameCode));
+          } else {
+            // Navigate to game finished page
+            context.go(GamePage.route(gameModel.gameCode));
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.all(ChronicleSpacing.sm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      gameModel.name ?? "Untitled Game",
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    // color: gameModel.isActive
-                    //     ? AppColors.primary.withOpacity(0.1)
-                    //     : AppColors.secondary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ChronicleSpacing.sm,
+                      vertical: ChronicleSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isCompleted
+                          ? AppColors.secondary.withOpacity(0.1)
+                          : AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      isCompleted ? "Completed" : "Active",
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: isCompleted
+                                ? AppColors.secondary
+                                : AppColors.primary,
+                          ),
+                    ),
                   ),
-                  child: Text(
-                    "Completed",
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        // color: gameModel.isActive
-                        //     ? AppColors.primary
-                        //     : AppColors.secondary,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            ChronicleSpacing.verticalXS,
-            Text(
-              "Code: ${gameModel.gameCode}",
-              style: ChronicleTextStyles.bodySmall(context).copyWith(
-                color: AppColors.textColor.withOpacity(0.6),
+                ],
               ),
-            ),
-            ChronicleSpacing.verticalSM,
-            if (!gameModel.isFinished)
-              ElevatedButton(
-                onPressed: () {
-                  context.go(GamePage.route(gameModel.gameCode));
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 40),
-                  backgroundColor: AppColors.primary,
-                ),
-                child: Text(
-                  "Continue Game",
-                  style: TextStyle(color: AppColors.surface),
-                ),
-              )
-            else
-              OutlinedButton(
-                onPressed: () {
-                  // Navigate to game summary or replay
-                },
-                style: OutlinedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 40),
-                  side: BorderSide(color: AppColors.primary),
-                ),
-                child: Text(
-                  "View Summary",
-                  style: TextStyle(color: AppColors.primary),
+              ChronicleSpacing.verticalXS,
+              Text(
+                "Code: ${gameModel.gameCode}",
+                style: ChronicleTextStyles.bodySmall(context).copyWith(
+                  color: AppColors.textColor.withOpacity(0.6),
                 ),
               ),
-          ],
+              ChronicleSpacing.verticalSM,
+              if (!isCompleted) _buildProgressIndicator(context),
+              ChronicleSpacing.verticalSM,
+              Row(
+                children: [
+                  Icon(
+                    Icons.people_alt_outlined,
+                    size: 16,
+                    color: AppColors.textColor.withOpacity(0.6),
+                  ),
+                  ChronicleSpacing.horizontalXS,
+                  Text(
+                    "${gameModel.participants?.length ?? 0}/${gameModel.maxPlayers}",
+                    style: ChronicleTextStyles.bodySmall(context).copyWith(
+                      color: AppColors.textColor.withOpacity(0.6),
+                    ),
+                  ),
+                  ChronicleSpacing.horizontalMD,
+                  Icon(
+                    Icons.repeat_outlined,
+                    size: 16,
+                    color: AppColors.textColor.withOpacity(0.6),
+                  ),
+                  ChronicleSpacing.horizontalXS,
+                  Text(
+                    "${gameModel.currentRound}/${gameModel.maxRounds}",
+                    style: ChronicleTextStyles.bodySmall(context).copyWith(
+                      color: AppColors.textColor.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildProgressIndicator(BuildContext context) {
+    return LinearProgressIndicator(
+      value: gameModel.currentRound / gameModel.maxRounds,
+      backgroundColor: AppColors.background,
+      color: AppColors.primary,
+      minHeight: 4,
+      borderRadius: BorderRadius.circular(2),
     );
   }
 }

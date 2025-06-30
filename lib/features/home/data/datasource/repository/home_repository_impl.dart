@@ -31,6 +31,8 @@ class HomeRepositoryImpl extends HomeRepository {
       return Either.right(games);
     } on DioException catch (e) {
       return Either.left(GameFailure(message: e.response?.data['error']));
+    } catch (e) {
+      return Either.left(GameFailure(message: 'Failed to fetch games'));
     }
   }
 
@@ -41,6 +43,8 @@ class HomeRepositoryImpl extends HomeRepository {
       return Either.right(games);
     } on DioException catch (e) {
       return Either.left(GameFailure(message: e.response?.data['error']));
+    } catch (e) {
+      return Either.left(GameFailure(message: 'Failed to fetch games'));
     }
   }
 }
