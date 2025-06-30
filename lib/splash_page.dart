@@ -39,7 +39,6 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
         _controller.forward();
 
-    // Simulate loading process
     SchedulerBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
@@ -61,7 +60,6 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // Animated background elements
           Positioned.fill(
             child: AnimatedBuilder(
               animation: _controller,
@@ -87,8 +85,6 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
               },
             ),
           ),
-
-          // Main content
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
