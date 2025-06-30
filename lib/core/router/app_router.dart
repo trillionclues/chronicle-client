@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 final RouteObserver<ModalRoute> routeObserver = RouteObserver<ModalRoute>();
 
 class AppRouter {
-  static var router = GoRouter(initialLocation: SplashPage.route, observers: [routeObserver], routes: [
+  static var router = GoRouter(initialLocation: SplashPage.route, routes: [
     GoRoute(
         path: SplashPage.route,
         builder: (context, state) {
@@ -39,5 +39,7 @@ class AppRouter {
         return CreateGamePage();
       },
     ),
+  ], observers: [
+    routeObserver
   ]);
 }

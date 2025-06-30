@@ -8,7 +8,7 @@ enum HomeStatus {
   loadingCompletedGames,
   success,
   successfullyCheckedGame,
-  error,
+  error,partialSuccess
 }
 
 class HomeState extends Equatable {

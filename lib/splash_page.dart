@@ -1,7 +1,9 @@
 import 'package:chronicle/core/theme/app_colors.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
+import 'package:chronicle/features/home/presentation/page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:go_router/go_router.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -42,7 +44,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     SchedulerBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
+          GoRouter.of(context).go(HomePage.route);
         }
       });
     });

@@ -23,7 +23,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   setup();
 
   runApp(MultiBlocProvider(
@@ -32,6 +31,10 @@ void main() async {
       BlocProvider(create: (context) => getIt<UserBloc>()..add(GetUserEvent())),
       BlocProvider(create: (context) => getIt<CreateGameBloc>()),
       BlocProvider(create: (context) => getIt<HomeBloc>()),
+      BlocProvider(
+        create: (context) => getIt<HomeBloc>()
+          ..add(GetAllGamesEvent()),
+      ),
     ],
     child: MaterialApp.router(
       routerConfig: AppRouter.router,
@@ -41,12 +44,6 @@ void main() async {
         return BlocListener<UserBloc, UserState>(
           listener: (context, state) {
             if (state.status == UserStatus.success) {
-              Future.microtask(() {
-                if (!context.mounted) return;
-                context.read<HomeBloc>()
-                  ..add(GetActiveGamesEvent())
-                  ..add(GetCompletedGamesEvent());
-              });
               AppRouter.router.go(HomePage.route);
             } else if (state.status == UserStatus.error ||
                 state.status == UserStatus.logout) {

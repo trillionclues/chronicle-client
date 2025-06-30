@@ -25,26 +25,37 @@ class HomeRepositoryImpl extends HomeRepository {
   }
 
   @override
-  Future<Either<Failure, List<GameModel>>> getActiveGames() async {
+  Future<Either<Failure, List<GameModel>>> getCompletedGames() async {
     try {
-      var games = await homeRemoteDataSource.getActiveGames(isActive: true);
-      return Either.right(games);
+      var games = await homeRemoteDataSource.getCompletedGames();
+      final completedGames = games.where((game) => game.isFinished).toList();
+      return Either.right(completedGames);
     } on DioException catch (e) {
-      return Either.left(GameFailure(message: e.response?.data['error']));
+      return Either.left(GameFailure(
+          message: e.response?.data['error'] ?? 'Failed to fetch completed games'
+      ));
     } catch (e) {
-      return Either.left(GameFailure(message: 'Failed to fetch games'));
+      return Either.left(GameFailure(
+        message: 'Failed to load completed games: ${e.toString()}',
+      ));
     }
   }
 
   @override
-  Future<Either<Failure, List<GameModel>>> getCompletedGames() async {
+  Future<Either<Failure, List<GameModel>>> getActiveGames() async {
     try {
-      var games = await homeRemoteDataSource.getActiveGames(isActive: false);
-      return Either.right(games);
+      var games = await homeRemoteDataSource.getActiveGames();
+      final activeGames = games.where((game) => !game.isFinished).toList();
+      return Either.right(activeGames);
+
     } on DioException catch (e) {
-      return Either.left(GameFailure(message: e.response?.data['error']));
+      return Either.left(GameFailure(
+          message: e.response?.data['error'] ?? 'Failed to fetch active games'
+      ));
     } catch (e) {
-      return Either.left(GameFailure(message: 'Failed to fetch games'));
+      return Either.left(GameFailure(
+        message: 'Failed to load active games: ${e.toString()}',
+      ));
     }
   }
 }

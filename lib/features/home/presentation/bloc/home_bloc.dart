@@ -9,8 +9,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   HomeBloc({required this.homeRepository}) : super(HomeState.initial()) {
     on<CheckGameByCodeEvent>(_onCheckGameByCodeEvent);
-    on<GetActiveGamesEvent>(_onGetActiveGames);
-    on<GetCompletedGamesEvent>(_onGetCompletedGames);
+    on<GetAllGamesEvent>(_onGetAllGames);
   }
 
   Future _onCheckGameByCodeEvent(
@@ -26,44 +25,54 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  Future _onGetActiveGames(
-      GetActiveGamesEvent event, Emitter<HomeState> emit) async {
-    emit(
-        state.copyWith(status: HomeStatus.loadingActiveGames, activeGames: []));
-
-    var result = await homeRepository.getActiveGames();
-    if (result.isRight()) {
+  Future<void> _onGetAllGames(
+      GetAllGamesEvent event,
+      Emitter<HomeState> emit
+      ) async {
+    try {
       emit(state.copyWith(
-          status: HomeStatus.success,
-          activeGames: result.right,
-          errorMessage: null));
-    } else {
-      emit(state.copyWith(
-          status: HomeStatus.error,
-          errorMessage: result.left.message,
-          activeGames: []));
-    }
-  }
-
-  Future _onGetCompletedGames(
-      GetCompletedGamesEvent event, Emitter<HomeState> emit) async {
-    emit(state.copyWith(
-      status: HomeStatus.loadingCompletedGames,
-      completedGames: [],
-    ));
-
-    var result = await homeRepository.getCompletedGames();
-    if (result.isRight()) {
-      emit(state.copyWith(
-        status: HomeStatus.success,
-        completedGames: result.right,
+        status: HomeStatus.loadingActiveGames,
+        activeGames: const [],
+        completedGames: const [],
         errorMessage: null,
       ));
-    } else {
+
+      final activeResult = await homeRepository.getActiveGames();
+      if (activeResult.isLeft()) {
+        emit(state.copyWith(
+          status: HomeStatus.error,
+          errorMessage: activeResult.left.message,
+        ));
+        return;
+      }
+
+      emit(state.copyWith(
+        status: HomeStatus.loadingCompletedGames,
+        activeGames: activeResult.right,
+      ));
+
+      final completedResult = await homeRepository.getCompletedGames();
+      if (completedResult.isLeft()) {
+        emit(state.copyWith(
+          status: HomeStatus.partialSuccess,
+          activeGames: activeResult.right,
+          completedGames: const [],
+          errorMessage: completedResult.left.message,
+        ));
+        return;
+      }
+      emit(state.copyWith(
+        status: HomeStatus.success,
+        activeGames: activeResult.right,
+        completedGames: completedResult.right,
+        errorMessage: null,
+      ));
+    } catch (e) {
       emit(state.copyWith(
         status: HomeStatus.error,
-        errorMessage: result.left.message,
-        completedGames: [],
+        errorMessage: 'Unexpected error: ${e.toString()}',
+        activeGames: const [],
+        completedGames: const [],
       ));
     }
   }

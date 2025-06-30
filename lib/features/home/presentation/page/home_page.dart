@@ -37,6 +37,14 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController controller = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeBloc>().add(GetAllGamesEvent());
+    });
+  }
+
+  @override
   void dispose() {
     super.dispose();
     controller.dispose();
@@ -273,15 +281,20 @@ class _HomePageState extends State<HomePage> {
               },
             );
           } else if (state.status != HomeStatus.successfullyCheckedGame &&
-              state.status != HomeStatus.loadingJoinGame) {
-            context.pop();
+              state.status != HomeStatus.loadingJoinGame && state.status != HomeStatus.initial) {
+            // if (Navigator.of(context, rootNavigator: true).canPop()) {
+            //     Navigator.of(context, rootNavigator: true).pop();
+            //   }
+            // context.pop();
+            // if there is context, pop before navigating
+            if (Navigator.canPop(context) && state.status != HomeStatus.initial) {
+              Navigator.pop(context);
+            }
           }
         },
         child: RefreshIndicator(
           onRefresh: () async {
-            context.read<HomeBloc>()
-              ..add(GetActiveGamesEvent())
-              ..add(GetCompletedGamesEvent());
+            context.read<HomeBloc>().add(GetAllGamesEvent());
             await Future.delayed(const Duration(milliseconds: 500));
           },
           child: CustomScrollView(

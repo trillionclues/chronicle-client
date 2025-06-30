@@ -17,17 +17,25 @@ class HomeRemoteDataSource {
     }
   }
 
-  Future<List<GameModel>> getActiveGames({bool? isActive}) async {
+  Future<List<GameModel>> getActiveGames() async {
     try {
-      var games = await dio.get('/games/user-games', queryParameters: {
-        'isActive': isActive,
+      final response = await dio.get('/games/user-games', queryParameters: {
+        'isActive': true,
       });
-
-      return (games.data as List)
-          .map((game) => GameModel.fromJson(game))
-          .toList();
+      return (response.data as List).map((game) => GameModel.fromJson(game)).toList();
     } catch (e) {
-      throw Exception('Failed to fetch active games');
+      throw Exception('Failed to fetch active games: ${e.toString()}');
+    }
+  }
+
+  Future<List<GameModel>> getCompletedGames() async {
+    try {
+      final response = await dio.get('/games/user-games', queryParameters: {
+        'isActive': false,
+      });
+      return (response.data as List).map((game) => GameModel.fromJson(game)).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch completed games: ${e.toString()}');
     }
   }
 }
