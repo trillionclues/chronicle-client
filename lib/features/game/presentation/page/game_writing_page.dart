@@ -74,7 +74,7 @@ class _GameWritingPageState extends State<GameWritingPage> {
           currentMode: currentMode,
         ),
         body: _buildBody(context, currentMode),
-        floatingActionButton: _buildManualNextPhaseButton(context),
+        // floatingActionButton: _buildManualNextPhaseButton(context),
       );
     });
   }

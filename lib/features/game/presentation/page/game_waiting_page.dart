@@ -154,7 +154,7 @@ class GameWaitingPage extends StatelessWidget {
 
         if (!isCreator) return const SizedBox.shrink();
 
-        final canStartGame = gameState.participants.length >= 1;
+        final canStartGame = gameState.participants.length >= 2;
 
         return SizedBox(
           width: double.infinity,
