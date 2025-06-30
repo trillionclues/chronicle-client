@@ -409,10 +409,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildGameHistorySection(context, AppMode currentMode) {
     return BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-      if ((state.status == HomeStatus.loadingCompletedGames &&
-              state.activeGames.isEmpty) ||
-          (state.status == HomeStatus.loadingActiveGames &&
-              state.completedGames.isEmpty)) {
+      if ((state.status == HomeStatus.loadingCompletedGames) ||
+          (state.status == HomeStatus.loadingActiveGames)) {
         return Center(
           child: CircularProgressIndicator(
             color: AppColors.primary,
@@ -457,7 +455,10 @@ class _HomePageState extends State<HomePage> {
                   currentMode: currentMode,
                 ))
           ],
-          if (state.activeGames.isEmpty && state.completedGames.isEmpty)
+          if (state.activeGames.isEmpty &&
+              state.completedGames.isEmpty &&
+              state.status != HomeStatus.loadingActiveGames &&
+              state.status != HomeStatus.loadingCompletedGames)
             Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(
