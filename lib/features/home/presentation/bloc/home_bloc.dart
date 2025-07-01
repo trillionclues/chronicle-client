@@ -1,6 +1,5 @@
-import 'package:chronicle/features/game/presentation/bloc/game_state.dart';
 import 'package:chronicle/features/home/domain/repository/home_repository.dart';
-import 'package:chronicle/features/home/presentation/bloc/game_state.dart';
+import 'package:chronicle/features/home/presentation/bloc/home_state.dart';
 import 'package:chronicle/features/home/presentation/bloc/home_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

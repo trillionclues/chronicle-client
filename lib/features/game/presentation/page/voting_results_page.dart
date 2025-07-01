@@ -162,7 +162,7 @@ class _VotingResultsPageState extends State<VotingResultsPage>
                     ),
                     SizedBox(height: ChronicleSpacing.md),
                     Text(
-                      "Written by ${winner.author?.name ?? 'Anonymous'} • ${winner.votes} ${winner.votes == 1 ? 'vote' : 'votes'}",
+                      "Written by ${winner.author.name ?? 'Anonymous'} • ${winner.votes} ${winner.votes == 1 ? 'vote' : 'votes'}",
                       style: ChronicleTextStyles.bodySmall(context).copyWith(
                         color: Colors.white.withOpacity(0.9),
                       ),
@@ -289,7 +289,7 @@ class _VotingResultsPageState extends State<VotingResultsPage>
                                   ),
                                   SizedBox(height: ChronicleSpacing.md),
                                   Text(
-                                    fragment.author?.name ?? 'Anonymous',
+                                    fragment.author.name ?? 'Anonymous',
                                     style:
                                         ChronicleTextStyles.bodySmall(context)
                                             .copyWith(color: Colors.grey),
@@ -325,7 +325,7 @@ class _VotingResultsPageState extends State<VotingResultsPage>
                                   ),
                                   SizedBox(height: ChronicleSpacing.md),
                                   Text(
-                                    fragment.author?.name ?? 'Anonymous',
+                                    fragment.author.name ?? 'Anonymous',
                                     style:
                                         ChronicleTextStyles.bodySmall(context)
                                             .copyWith(

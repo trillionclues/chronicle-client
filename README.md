@@ -113,3 +113,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Contact
 
 For any inquiries, please contact us at [support@chronicle.com](mailto:exceln646@gmail.com).
+
+
+
+
+
+
+
+
+
+
+
+
+

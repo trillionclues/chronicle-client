@@ -53,7 +53,8 @@ class GameState extends Equatable {
   final String? title;
   final String? gameCode;
   final String? gameId;
-  final GamePhase gamePhase;
+  final GamePhase? gamePhase;
+  final GamePhase? previousGamePhase;
   final int currentRound;
   final int rounds;
   final int votingDuration;
@@ -69,7 +70,8 @@ class GameState extends Equatable {
     this.title,
     this.gameCode,
     this.gameId,
-    this.gamePhase = GamePhase.waiting,
+    this.gamePhase,
+    this.previousGamePhase,
     this.currentRound = 1,
     this.rounds = 5,
     this.votingDuration = 60,
@@ -89,6 +91,7 @@ class GameState extends Equatable {
     String? gameCode,
     String? gameId,
     GamePhase? gamePhase,
+    GamePhase? previousGamePhase,
     int? currentRound,
     int? rounds,
     int? votingDuration,
@@ -105,6 +108,7 @@ class GameState extends Equatable {
       gameCode: gameCode ?? this.gameCode,
       gameId: gameId ?? this.gameId,
       gamePhase: gamePhase ?? this.gamePhase,
+      previousGamePhase: previousGamePhase ?? this.previousGamePhase,
       currentRound: currentRound ?? this.currentRound,
       rounds: rounds ?? this.rounds,
       votingDuration: votingDuration ?? this.votingDuration,

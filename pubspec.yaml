@@ -53,6 +53,7 @@ dependencies:
   go_router: 14.3.0
   flutter_dotenv: 5.2.1
 
+  json_annotation: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

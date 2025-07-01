@@ -304,7 +304,7 @@ class GameRemoteDatasource {
           maxParticipants: _parseInt(data['maxPlayers']) ?? 10,
         );
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       if (!_isDisposed) {
         onError('Error processing game update: $e');
       }

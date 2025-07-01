@@ -1,7 +1,6 @@
 import 'package:chronicle/core/di/get_it.dart';
 import 'package:chronicle/core/router/app_router.dart';
 import 'package:chronicle/core/theme/app_theme.dart';
-import 'package:chronicle/core/utils/app_mode.dart';
 import 'package:chronicle/core/utils/app_mode_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_bloc.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';

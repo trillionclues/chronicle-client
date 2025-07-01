@@ -95,7 +95,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   void _onGameStateUpdateEvent(
       GameStateUpdatedEvent event, Emitter<GameState> emit) {
-    if (_disposed) return; // Check if disposed
+    if (_disposed) return;
 
     emit(state.copyWith(
       status: GameStatus.success,

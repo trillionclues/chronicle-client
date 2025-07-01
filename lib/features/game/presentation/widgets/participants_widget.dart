@@ -96,7 +96,7 @@ class ParticipantsWidget extends StatelessWidget {
                   shape: BoxShape.circle,
                   image: participant.photoUrl != null
                       ? DecorationImage(
-                          image: NetworkImage(participant.photoUrl!),
+                          image: NetworkImage(participant.photoUrl),
                           fit: BoxFit.cover,
                         )
                       : null,

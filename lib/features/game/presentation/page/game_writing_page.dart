@@ -101,9 +101,9 @@ class _GameWritingPageState extends State<GameWritingPage> {
                       throw Exception("User not found in participants"),
                 );
 
-                if (participant?.hasSubmitted != _hasSubmitted) {
+                if (participant.hasSubmitted != _hasSubmitted) {
                   setState(() {
-                    _hasSubmitted = participant?.hasSubmitted ?? false;
+                    _hasSubmitted = participant.hasSubmitted ?? false;
                     if (_hasSubmitted) {
                       _controller.clear();
                       _charCount = 0;

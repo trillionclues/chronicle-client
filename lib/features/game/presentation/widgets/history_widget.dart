@@ -77,11 +77,11 @@ class HistoryWidget extends StatelessWidget {
                             CircleAvatar(
                               radius: ChronicleSizes.avatarSmall / 2,
                               backgroundImage:
-                                  NetworkImage(fragment.author?.photoUrl ?? ''),
+                                  NetworkImage(fragment.author.photoUrl ?? ''),
                             ),
                             ChronicleSpacing.horizontalSM,
                             Text(
-                              fragment.author?.name ?? 'Anonymous',
+                              fragment.author.name ?? 'Anonymous',
                               style: TextStyle(
                                 color: AppColors.textColor,
                                 fontWeight: FontWeight.w500,
@@ -91,11 +91,11 @@ class HistoryWidget extends StatelessWidget {
                         ),
                         ChronicleSpacing.verticalSM,
                       ],
-                      if (showRoundNumbers && fragment.round != null) ...[
+                      if (showRoundNumbers) ...[
                         Text(
                           'Round ${fragment.round}',
                           style:
-                              ChronicleTextStyles.bodySmall(context)?.copyWith(
+                              ChronicleTextStyles.bodySmall(context).copyWith(
                             color: Colors.grey,
                             fontStyle: FontStyle.italic,
                           ),

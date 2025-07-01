@@ -151,7 +151,7 @@ class GamePhaseAppbar extends StatelessWidget implements PreferredSizeWidget {
       builder: (dialogContext) => AlertDialog(
         title: Text("Cancel ${currentMode.displayName}?"),
         content: Text(
-          "Are you sure you want to cancel this ${currentMode.displayName?.toLowerCase()}? This will end the ${currentMode.displayName?.toLowerCase()} for all players.",
+          "Are you sure you want to cancel this ${currentMode.displayName.toLowerCase()}? This will end the ${currentMode.displayName.toLowerCase()} for all players.",
         ),
         actions: [
           TextButton(

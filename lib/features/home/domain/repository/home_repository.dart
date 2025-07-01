@@ -4,7 +4,6 @@ import 'package:chronicle/features/game/domain/model/game_model.dart';
 
 abstract class HomeRepository {
   Future<Either<Failure, GameModel>> checkGameByCode(String gameCode);
-
-  Future<Either<Failure, List<GameModel>>> getActiveGames();
   Future<Either<Failure, List<GameModel>>> getCompletedGames();
+  Future<Either<Failure, List<GameModel>>> getActiveGames();
 }

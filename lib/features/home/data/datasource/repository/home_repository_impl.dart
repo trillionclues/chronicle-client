@@ -28,8 +28,7 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<Either<Failure, List<GameModel>>> getCompletedGames() async {
     try {
       var games = await homeRemoteDataSource.getCompletedGames();
-      final completedGames = games.where((game) => game.isFinished).toList();
-      return Either.right(completedGames);
+      return Either.right(games);
     } on DioException catch (e) {
       return Either.left(GameFailure(
           message: e.response?.data['error'] ?? 'Failed to fetch completed games'
@@ -45,8 +44,7 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<Either<Failure, List<GameModel>>> getActiveGames() async {
     try {
       var games = await homeRemoteDataSource.getActiveGames();
-      final activeGames = games.where((game) => !game.isFinished).toList();
-      return Either.right(activeGames);
+      return Either.right(games);
 
     } on DioException catch (e) {
       return Either.left(GameFailure(

@@ -1,5 +1,4 @@
 import 'package:chronicle/core/theme/app_colors.dart';
-import 'package:chronicle/core/utils/app_mode.dart';
 import 'package:chronicle/core/utils/chronicle_spacing.dart';
 import 'package:chronicle/core/utils/snackbar_extensions.dart';
 import 'package:chronicle/features/game/presentation/bloc/game_state.dart';

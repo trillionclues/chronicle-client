@@ -53,7 +53,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
 
         // Filter votable fragments (excluding current user's own)
         final votableFragments = currentRoundFragments
-            .where((f) => f.author?.id != currentUserId)
+            .where((f) => f.author.id != currentUserId)
             .toList();
 
         return Column(
@@ -166,7 +166,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
     StoryFragmentModel fragment,
     int index,
   ) {
-    final isSelected = selectedFragmentId == fragment.author?.id;
+    final isSelected = selectedFragmentId == fragment.author.id;
     final fragmentLabel = String.fromCharCode(65 + index);
 
     return Container(
@@ -309,7 +309,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
 
   void _handleVote(StoryFragmentModel fragment) {
     setState(() {
-      selectedFragmentId = fragment.author?.id;
+      selectedFragmentId = fragment.author.id;
     });
 
     _showVoteConfirmation(context, fragment);
@@ -336,7 +336,7 @@ class _GameVotingPageState extends State<GameVotingPage> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              gameBloc.add(SubmitVoteEvent(userId: fragment.author?.id ?? ''));
+              gameBloc.add(SubmitVoteEvent(userId: fragment.author.id ?? ''));
               setState(() {
                 hasVoted = true;
               });

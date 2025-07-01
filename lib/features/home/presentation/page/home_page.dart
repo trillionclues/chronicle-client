@@ -16,7 +16,7 @@ import 'package:chronicle/features/auth/presentation/bloc/user_event.dart';
 import 'package:chronicle/features/auth/presentation/bloc/user_state.dart';
 import 'package:chronicle/features/create_game/presentation/page/create_game_page.dart';
 import 'package:chronicle/features/game/presentation/page/game_page.dart';
-import 'package:chronicle/features/home/presentation/bloc/game_state.dart';
+import 'package:chronicle/features/home/presentation/bloc/home_state.dart';
 import 'package:chronicle/features/home/presentation/bloc/home_bloc.dart';
 import 'package:chronicle/features/home/presentation/bloc/home_event.dart';
 import 'package:chronicle/features/home/presentation/widget/game_widget.dart';
@@ -447,6 +447,7 @@ class _HomePageState extends State<HomePage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if(state.activeGames.isNotEmpty && state.completedGames.isNotEmpty)
           Text(
             "${currentMode.displayName} History",
             style: Theme.of(context).textTheme.headlineSmall,
@@ -496,7 +497,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: ChronicleSpacing.sm),
                     Text(
-                      "Create or join a ${currentMode.displayName?.toLowerCase()} to get started!",
+                      "Create or join a ${currentMode.displayName.toLowerCase()} to get started!",
                       style: ChronicleTextStyles.bodySmall(context).copyWith(
                         color: AppColors.textColor.withOpacity(0.4),
                       ),

@@ -36,7 +36,7 @@ class AuthRepositoryImpl extends AuthRepository {
       return Either.right(request);
     } on DioException catch (e) {
       return Either.left(AuthFailure(message: e.response?.data['error']));
-    } on Exception catch (e) {
+    } on Exception {
       return Either.left(AuthFailure(message: "Authentication failure!"));
     }
   }
